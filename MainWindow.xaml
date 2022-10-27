@@ -1,0 +1,652 @@
+﻿<Window x:Class="MCAJawIns.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:local="clr-namespace:MCAJawIns" 
+        mc:Ignorable="d"
+        
+        TextElement.Foreground="{StaticResource MaterialDesignLightForeground}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="14"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        FontFamily="{StaticResource MaterialDesignFont}"
+        Background="{StaticResource MaterialDesignPaper}"
+        
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        WindowState="Normal"
+        AllowsTransparency="True"
+        WindowStartupLocation="CenterScreen" 
+        d:DataContext="{d:DesignInstance Type=local:MainWindow}"
+        Loaded="Window_Loaded"
+        Closing="Window_Closing"
+        Closed="Window_Closed"
+        Topmost="False"
+        Title="MainWindow" Width="1600" Height="900">
+    <!--<Window.DataContext>
+        <local:MainWindowVeiwMode></local:MainWindowVeiwMode>
+    </Window.DataContext>-->
+
+    <!--#region Resources -->
+    <Window.Resources>
+        <!--#region Appbar -->
+        <RoutedUICommand x:Key="QuitAction" Text="Quit" />
+        <RoutedUICommand x:Key="MinAction" Text="Min" />
+        <RoutedUICommand x:Key="MaxAction" Text="Max" />
+        <!--#endregion-->
+        <!--#region Toobar -->
+        <RoutedUICommand x:Key="OpenDevice" Text="Open Device" />
+        <RoutedUICommand x:Key="SingleShot" Text="Single Shot" />
+        <RoutedUICommand x:Key="ContinuousShot" Text="Continuous Shot" />
+        <RoutedUICommand x:Key="ToggleStreamGrabber" Text="Toggle Stream Grabber" />
+        <RoutedUICommand x:Key="RetrieveImage" Text="Retrieve Image" />
+        <RoutedUICommand x:Key="CrosshairOn" Text="Crosshair On" />
+        <RoutedUICommand x:Key="AssistRectOn" Text="Assist Rect On" />
+        <RoutedUICommand x:Key="AssistPointsOn" Text="Assist Points On" />
+        <!--Tab-->
+        <RoutedUICommand x:Key="SwitchTab" Text="Switch Tab" />
+        <RoutedUICommand x:Key="SwitchJawTab" Text="Switch Jaw Tab" />
+        <!--Global-->
+        <RoutedUICommand x:Key="GlobalTest" Text="Test global command" />
+        <!--#endregion-->
+    </Window.Resources>
+    <!--#endregion-->
+    
+    <!--#region InputBindings -->
+    <Window.InputBindings>
+        <!--Appbar-->
+        <KeyBinding Modifiers="Ctrl" Key="W" Command="{StaticResource QuitAction}" />
+        <KeyBinding Gesture="F10" Command="{StaticResource MinAction}" />
+        <KeyBinding Gesture="F11" Command="{StaticResource MaxAction}" />
+        <!--Toolbar-->
+        <KeyBinding Modifiers="Ctrl" Key="O" Command="{StaticResource OpenDevice}" />
+        <KeyBinding Key="F5" Command="{StaticResource SingleShot}" />
+        <KeyBinding Key="F6" Command="{StaticResource ContinuousShot}" />
+        <KeyBinding Key="F7" Command="{StaticResource ToggleStreamGrabber}" />
+        <KeyBinding Key="F8" Command="{StaticResource RetrieveImage}" />
+        <KeyBinding Key="F1" Command="{StaticResource CrosshairOn}" />
+        <KeyBinding Key="F2" Command="{StaticResource AssistRectOn}" />
+        <KeyBinding Key="F3" Command="{StaticResource AssistPointsOn}" />
+        <!--Tab-->
+        <!--D1 means 1 -->
+        <KeyBinding Modifiers="Alt" Key="D1" Command="{StaticResource SwitchTab}" CommandParameter="0" />
+        <!--D2 means 2 -->
+        <KeyBinding Modifiers="Alt" Key="D2" Command="{StaticResource SwitchTab}" CommandParameter="1" />
+        <!--D3 means 3-->
+        <KeyBinding Modifiers="Alt" Key="D3" Command="{StaticResource SwitchTab}" CommandParameter="2" />
+        <!--D4 means 4-->
+        <KeyBinding Modifiers="Alt" Key="D4" Command="{StaticResource SwitchTab}" CommandParameter="3" />
+        <!--D5 means 5-->
+        <KeyBinding Modifiers="Alt" Key="D5" Command="{StaticResource SwitchTab}" CommandParameter="4" />
+        <!--D6 means 6-->
+        <!--<KeyBinding Modifiers="Alt" Key="D6" Command="{StaticResource SwitchTab}" CommandParameter="5" />-->
+        <!--D0 means 0, 255 routes system info tab-->
+        <KeyBinding Modifiers="Alt" Key="D0" Command="{StaticResource SwitchTab}" CommandParameter="255" />
+        <!--Main Image  -->
+        <KeyBinding Modifiers="Alt" Key="Q" Command="{StaticResource SwitchJawTab}" CommandParameter="0" />
+        <!--Specification Setting -->
+        <KeyBinding Modifiers="Alt" Key="W" Command="{StaticResource SwitchJawTab}" CommandParameter="1" />
+        <!--Config-->
+
+        <!--Global-->
+        <KeyBinding Modifiers="Ctrl" Key="G" Command="{StaticResource GlobalTest}" />
+    </Window.InputBindings>
+    <!--#endregion-->
+    
+    <!--#region CommandBindings -->
+    <Window.CommandBindings>
+        <!--Appbar-->
+        <CommandBinding Command="{StaticResource QuitAction}" CanExecute="QuitCommandCanExecute" Executed="QuitWidow_Command" />
+        <CommandBinding Command="{StaticResource MinAction}" CanExecute="CanExcute" Executed="MinWindow_Command" />
+        <CommandBinding Command="{StaticResource MaxAction}" CanExecute="CanExcute" Executed="MaxWindow_Commnad" />
+        <!--EngineerTab Toolbar-->
+        <CommandBinding Command="{StaticResource OpenDevice}" CanExecute="OpenDeviceCanExecute" Executed="OpenDeviceCommand" />
+        <CommandBinding Command="{StaticResource SingleShot}" CanExecute="SingleShotCanExecute" Executed="SingleShotCommand" />
+        <CommandBinding Command="{StaticResource ContinuousShot}" CanExecute="ContinousShotCanExecute" Executed="ContinousShotCommand" />
+        <CommandBinding Command="{StaticResource ToggleStreamGrabber}" CanExecute="ToggleStreamGrabberCanExecute" Executed="ToggleStreamGrabberCommand" />
+        <CommandBinding Command="{StaticResource RetrieveImage}" CanExecute="RetrieveImageCanExecute" Executed="RetrieveImageCommand" />
+        <CommandBinding Command="{StaticResource CrosshairOn}" CanExecute="EngineerTabCanExcute" Executed="CrosshairOnCommnad" />
+        <CommandBinding Command="{StaticResource AssistRectOn}" CanExecute="EngineerTabCanExcute" Executed="AssisRectOnCommand" />
+        <CommandBinding Command="{StaticResource AssistPointsOn}" CanExecute="EngineerTabCanExcute" Executed="AssistPointsOnCommand" />
+        <!--Switch Tab-->
+        <CommandBinding Command="{StaticResource SwitchTab}" CanExecute="CanExcute" Executed="SwitchTabCommand" />
+        <CommandBinding Command="{StaticResource SwitchJawTab}" CanExecute="MainTabCanExcute" Executed="SwitchJawTabCommand" />
+        <!--Config-->
+
+        <!--Global-->
+        <CommandBinding Command="{StaticResource GlobalTest}" CanExecute="CanExcute" Executed="GlobalTest" />
+    </Window.CommandBindings>
+    <!--#endregion-->
+    <!--//-->
+    <Border x:Name="MainBorder" HorizontalAlignment="Stretch" Style="{StaticResource MainWindowBorder}">
+        <Grid>
+            <!--#region Layout -->
+            <Grid.RowDefinitions>
+                <!-- Appbar -->
+                <RowDefinition Height="auto" />
+                <!-- Content -->
+                <RowDefinition Height="1*" />
+                <!-- Footer -->
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <!--#endregion-->
+
+            <!--#region Appbar, Set focusale because needing to blur other control -->
+            <Grid x:Name="TitleGrid" Grid.Row="0" Margin="5 3" Background="Transparent" MouseLeftButtonDown="TitleGrid_MouseLeftButtonDown" Focusable="True">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+
+                <Image Grid.Column="0" HorizontalAlignment="Left" Height="30" Source="pack://application:,,,/intai.png" />
+
+                <!--
+                    <TextBlock Grid.Column="0" Text="{Binding Title, FallbackValue=Default, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" 
+                VerticalAlignment="Center" Style="{StaticResource MainWindowTitle}" />
+                -->
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <!--Click="Minbtn_Click" -->
+                    <Button x:Name="Minbtn" Content="{materialDesign:PackIcon Kind=WindowMinimize}" Margin="5 0" Style="{StaticResource WindowButton}"
+                            Visibility="{Binding DebugMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window,AncestorLevel=1}, Converter={StaticResource BooleanToVisibility}}"
+                            IsEnabled="{Binding DebugMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}}"
+                            Command="{StaticResource MinAction}" />
+                    <!--Click="Maxbtn_Click" -->
+                    <Button x:Name="Maxbtn" Margin="5 0" Style="{StaticResource WindowButton}"
+                            Visibility="{Binding DebugMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window,AncestorLevel=1}, Converter={StaticResource BooleanToVisibility}}"
+                            IsEnabled="{Binding DebugMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}}"
+                            Command="{StaticResource MaxAction}">
+                        <materialDesign:PackIcon>
+                            <materialDesign:PackIcon.Style>
+                                <Style TargetType="materialDesign:PackIcon">
+                                    <Style.Triggers>
+                                        <DataTrigger
+                                                Binding="{Binding WindowState, FallbackValue=Normal, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}"
+                                                Value="Maximized">
+                                            <Setter Property="Kind" Value="WindowRestore" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                    <Setter Property="Kind" Value="WindowMaximize" />
+                                </Style>
+                            </materialDesign:PackIcon.Style>
+                        </materialDesign:PackIcon>
+                    </Button>
+                    <!--Click="Quitbtn_Click"-->
+                    <Button x:Name="Quitbtn" Content="{materialDesign:PackIcon Kind=WindowClose}" Margin="5 0" Style="{StaticResource WindowButton}"
+                            Visibility="{Binding DebugMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window, AncestorLevel=1}, Converter={StaticResource BooleanToVisibility}}"
+                            IsEnabled="{Binding DebugMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}, AncestorLevel=1}}"
+                            Command="{StaticResource QuitAction}" />
+                </StackPanel>
+            </Grid>
+            <!--#endregion-->
+
+            <!--#region TabControl -->
+            <TabControl x:Name="AppTabControl" Grid.Row="1" VerticalAlignment="Stretch" Style="{StaticResource MaterialDesignNavigatilRailTabControl}"
+                    materialDesign:ColorZoneAssist.Mode="Custom" materialDesign:ColorZoneAssist.Background="{StaticResource ColorBrownTransparent}"
+                    SelectedIndex="{Binding OnNavIndex, RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <!--#region Resources -->
+                <TabControl.Resources>
+                    <Style TargetType="TextBlock" x:Key="ToolTipText">
+                        <Setter Property="FontSize" Value="{StaticResource Header-xs}" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                        <Setter Property="FontFamily" Value="微軟正黑體" />
+                    </Style>
+                    <!--//-->
+                    <Style TargetType="ToolTip" BasedOn="{StaticResource MaterialDesignToolTip}">
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="UseLayoutRounding" Value="True" />
+                        <Setter Property="Height" Value="32" />
+                    </Style>
+                </TabControl.Resources>
+                <!--#endregion-->
+
+                <!--#region Main Tab -->
+                <TabItem Width="48" Height="48" Margin="0 0 0 8" materialDesign:RippleAssist.IsDisabled="True" Style="{StaticResource MaterialDesignNavigationRailTabItem}">
+                    <TabItem.Header>
+                        <materialDesign:PackIcon Kind="ViewList" Width="30" Height="26" Foreground="White" Background="Transparent" ToolTipService.Placement="Right"
+                                ToolTipService.HorizontalOffset="12" ToolTipService.VerticalOffset="-3">
+                            <materialDesign:PackIcon.ToolTip>
+                                <TextBlock Text="主畫面" Style="{StaticResource ToolTipText}" />
+                            </materialDesign:PackIcon.ToolTip>
+                        </materialDesign:PackIcon>
+                    </TabItem.Header>
+                    <!--//-->
+                    <!--<content:MainTab x:Name="MainTab" Focusable="True" FocusVisualStyle="{x:Null}"/>-->
+                    <!--<content:MCAJaw x:Name="JawTab" Focusable="True" FocusVisualStyle="{x:Null}"/>-->
+                </TabItem>
+                <!--#endregion-->
+
+                <!--#region Camera Tab -->
+                <TabItem Width="48" Height="48" Margin="0 0 0 8" materialDesign:RippleAssist.IsDisabled="True" Style="{StaticResource MaterialDesignNavigationRailTabItem}" IsEnabled="{Binding AuthLevel, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window, AncestorLevel=1}, 
+                            Converter={StaticResource NumberGreaterConvert}, ConverterParameter=5, UpdateSourceTrigger=PropertyChanged}">
+                    <TabItem.Header>
+                        <materialDesign:PackIcon Kind="FileCog" Width="30" Height="26" Foreground="White" Background="Transparent" ToolTipService.Placement="Right"
+                                ToolTipService.HorizontalOffset="12" ToolTipService.VerticalOffset="-3">
+                            <materialDesign:PackIcon.ToolTip>
+                                <TextBlock Text="相機組態頁面" Style="{StaticResource ToolTipText}" />
+                            </materialDesign:PackIcon.ToolTip>
+                        </materialDesign:PackIcon>
+                    </TabItem.Header>
+                    <!--//-->
+                    <!--<content:DeviceTab x:Name="DeviceTab" Focusable="True" FocusVisualStyle="{x:Null}"/>-->
+                </TabItem>
+                <!--#endregion-->
+
+                <!--#region Motion Tab -->
+                <TabItem Width="48" Height="48" Margin="0 0 0 8" materialDesign:RippleAssist.IsDisabled="True" Style="{StaticResource MaterialDesignNavigationRailTabItem}" IsEnabled="{Binding AuthLevel, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window, AncestorLevel=1}, 
+                            Converter={StaticResource NumberGreaterConvert}, ConverterParameter=5, UpdateSourceTrigger=PropertyChanged}" Visibility="Collapsed">
+                    <TabItem.Header>
+                        <materialDesign:PackIcon Kind="Motion" Width="30" Height="26" Foreground="White" Background="Transparent" ToolTipService.Placement="Right"
+                                ToolTipService.HorizontalOffset="12" ToolTipService.VerticalOffset="-3">
+                            <materialDesign:PackIcon.ToolTip>
+                                <TextBlock Text="運動控制頁面" Style="{StaticResource ToolTipText}" />
+                            </materialDesign:PackIcon.ToolTip>
+                        </materialDesign:PackIcon>
+                    </TabItem.Header>
+                    <!--//-->
+                    <!--<content:MotionTab x:Name="MotionTab" Focusable="True" FocusVisualStyle="{x:Null}"/>-->
+                </TabItem>
+                <!--#endregion-->
+                <!--//-->
+
+                <!--#region Test Lazy Loading -->
+                <TabItem Width="48" Height="48" Margin="0 0 0 8" materialDesign:RippleAssist.IsDisabled="True" Style="{StaticResource MaterialDesignNavigationRailTabItem}" IsEnabled="{Binding AuthLevel, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window, AncestorLevel=1}, 
+                            Converter={StaticResource NumberGreaterConvert}, ConverterParameter=1, UpdateSourceTrigger=PropertyChanged}">
+                    <!--IsEnabled="{Binding LoginFlag, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window, AncestorLevel=1}, UpdateSourceTrigger=PropertyChanged}"-->
+                    <TabItem.Header>
+                        <materialDesign:PackIcon Kind="DatabaseSearch" Width="30" Height="26" Foreground="White" Background="Transparent" ToolTipService.Placement="Right"
+                                ToolTipService.HorizontalOffset="12" ToolTipService.VerticalOffset="-3">
+                            <materialDesign:PackIcon.ToolTip>
+                                <TextBlock Text="資料庫頁面" Style="{StaticResource ToolTipText}" />
+                            </materialDesign:PackIcon.ToolTip>
+                        </materialDesign:PackIcon>
+                    </TabItem.Header>
+                    <!-- // -->
+                    <!--<content:DatabaseTab x:Name="DatabaseTab" Focusable="True" FocusVisualStyle="{x:Null}"/>-->
+                </TabItem>
+                <!--#endregion-->
+
+                <!--#region Engineer Tab -->
+                <TabItem Width="48" Height="48" Margin="0 0 0 8" materialDesign:RippleAssist.IsDisabled="True" Style="{StaticResource MaterialDesignNavigationRailTabItem}" IsEnabled="{Binding AuthLevel, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window, AncestorLevel=1}, 
+                            Converter={StaticResource NumberGreaterConvert}, ConverterParameter=9, UpdateSourceTrigger=PropertyChanged}"
+                        Visibility="{Binding DebugMode, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window, AncestorLevel=1}, Mode=OneTime, Converter={StaticResource BooleanToVisibility}}">
+                    <TabItem.Header>
+                        <materialDesign:PackIcon Kind="HammerWrench" Width="30" Height="26" Foreground="White" Background="Transparent" ToolTipService.Placement="Right"
+                                ToolTipService.HorizontalOffset="12" ToolTipService.VerticalOffset="-3">
+                            <materialDesign:PackIcon.ToolTip>
+                                <TextBlock Text="開發者頁面" Style="{StaticResource ToolTipText}" />
+                            </materialDesign:PackIcon.ToolTip>
+                        </materialDesign:PackIcon>
+                    </TabItem.Header>
+                    <!-- // -->
+                    <!--<content:EngineerTab x:Name="EngineerTab" Focusable="True" FocusVisualStyle="{x:Null}"/>-->
+                </TabItem>
+                <!--#endregion-->
+
+                <!--#region System Information Tab, always at the last  -->
+                <TabItem Width="48" Height="48" Margin="0 0 0 8" materialDesign:RippleAssist.IsDisabled="True" Style="{StaticResource MaterialDesignNavigationRailTabItem}"
+                        Visibility="Hidden">
+                    <TabItem.Header>
+                        <materialDesign:PackIcon Kind="InformationCircleOutline" Width="30" Height="26" Foreground="White" />
+                    </TabItem.Header>
+                </TabItem>
+                <!--#endregion-->
+                <!--//-->
+            </TabControl>
+            <!--#endregion-->
+
+            <!--#region TabControl Bottom -->
+            <Border Grid.Row="1" ClipToBounds="True" Background="{x:Null}">
+                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Background="{x:Null}">
+                    <!--#region Login -->
+                    <Button x:Name="UserLogin" Width="48" Height="48" Margin="0 0 0 8" Padding="0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                            materialDesign:RippleAssist.IsDisabled="True" Focusable="False" Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                            CommandTarget="{Binding ElementName=LoginDialog}" Style="{StaticResource MaterialDesignToolButton}" PreviewMouseDown="UserLogin_PreviewMouseDown">
+                        <!--#region CommandParameter -->
+                        <Button.CommandParameter>
+                            <DockPanel MinWidth="320" Margin="16" MouseDown="Panels_MouseDown" Background="Transparent">
+                                <TextBlock DockPanel.Dock="Top" Text="LOGIN" Style="{StaticResource MaterialDesignHeadline6TextBlock}" />
+                                <Separator DockPanel.Dock="Top" Margin="0 12" />
+
+                                <!--#region 密碼 & Hint -->
+                                <PasswordBox x:Name="LoginPassword" DockPanel.Dock="Top" materialDesign:HintAssist.Hint="password"
+                                        materialDesign:HintAssist.Foreground="{StaticResource ColorInfo}" Padding="8 3" Height="24" FontWeight="Bold"
+                                        BorderBrush="{StaticResource ColorInfo}" CaretBrush="{StaticResource ColorInfoTransparent}"
+                                        Style="{StaticResource MaterialDesignOutlinedPasswordBox}">
+                                </PasswordBox>
+
+                                <TextBlock x:Name="LoginPasswordHint" DockPanel.Dock="Top" HorizontalAlignment="Right" FontWeight="SemiBold" Padding="8 0" Margin="0 -18 0 0"
+                                        FontSize="12" Foreground="{StaticResource ColorErrorTransparent}" />
+                                <!--#endregion-->
+
+                                <Button x:Name="LoginBtn" DockPanel.Dock="Left" HorizontalAlignment="Left" Margin="8 12 8 0" Width="120"
+                                        Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="Login" Content="OK" BorderThickness="0"
+                                        materialDesign:RippleAssist.IsDisabled="True" materialDesign:ButtonAssist.CornerRadius="16" Foreground="{StaticResource ColorSuccess}"
+                                        Style="{StaticResource MaterialDesignOutlinedButton}" Focusable="False" PreviewMouseDown="LoginBtn_PreviewMouseDown" />
+                                <!--PreviewMouseDown="LoginBtn_PreviewMouseDown"-->
+
+                                <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Margin="8 12 8 0" Width="120"
+                                        Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" CommandParameter="LoginCancel" Content="CANCEL" BorderThickness="0"
+                                        materialDesign:RippleAssist.IsDisabled="True" materialDesign:ButtonAssist.CornerRadius="16" Focusable="False"
+                                        Foreground="{StaticResource ColorWarning}" Style="{StaticResource MaterialDesignOutlinedButton}" />
+                            </DockPanel>
+                        </Button.CommandParameter>
+                        <!--#endregion-->
+
+                        <!--#region Content -->
+                        <materialDesign:PackIcon Width="30" Height="26" ToolTip="登入" ToolTipService.Placement="Right" ToolTipService.HorizontalOffset="12"
+                                Foreground="{StaticResource ColorWhiteTransparent}" Background="Transparent" Kind="AccountLock">
+                            <materialDesign:PackIcon.Style>
+                                <Style TargetType="materialDesign:PackIcon">
+                                    <Style.Triggers>
+                                        <DataTrigger
+                                                Binding="{Binding LoginFlag, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Window,AncestorLevel=1}, UpdateSourceTrigger=PropertyChanged}"
+                                                Value="True">
+                                            <Setter Property="Visibility" Value="Hidden" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </materialDesign:PackIcon.Style>
+                        </materialDesign:PackIcon>
+                        <!--#endregion-->
+                    </Button>
+                    <!--#endregion-->
+
+                    <!--#region PopupBox -->
+                    <materialDesign:PopupBox HorizontalAlignment="Right" PlacementMode="RightAndAlignBottomEdges" Focusable="False" materialDesign:RippleAssist.IsDisabled="True"
+                            Padding="0 8">
+                        <materialDesign:PopupBox.ToggleContent>
+                            <!--Margin 為計算後結果-->
+                            <Border Width="48" Height="48" Margin="-1 -1 0 7">
+                                <materialDesign:PackIcon VerticalAlignment="Center" Width="30" Height="26" Kind="Cog" HorizontalAlignment="Center"
+                                        Foreground="{StaticResource ColorWhiteTransparent}" Background="Transparent" />
+                            </Border>
+                        </materialDesign:PopupBox.ToggleContent>
+                        <!--//-->
+                        <StackPanel Orientation="Vertical" MinWidth="180">
+                            <StackPanel.Resources>
+                                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="Margin" Value="0" />
+                                    <Setter Property="FontWeight" Value="Bold" />
+                                    <Setter Property="Cursor" Value="Hand" />
+                                    <Setter Property="Foreground" Value="{StaticResource ColorBrown}" />
+                                </Style>
+                            </StackPanel.Resources>
+
+                            <Button Command="{StaticResource SwitchTab}" CommandParameter="255">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <materialDesign:PackIcon Width="24" Height="18" Kind="InformationCircleOutline" VerticalAlignment="Center" />
+                                        <TextBlock MinWidth="80" Margin="8 0 0 0" Text="系統資訊" VerticalAlignment="Center" TextAlignment="Right" />
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+
+                            <Button Visibility="{Binding LoginFlag, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Window, AncestorLevel=1}, 
+                                    UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibility}}" Click="Logout_Click">
+                                <!--已登入才顯示-->
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <materialDesign:PackIcon Width="24" Height="18" Kind="Logout" VerticalAlignment="Center" />
+                                        <TextBlock MinWidth="80" Margin="8 0 0 0" Text="登出" VerticalAlignment="Center" TextAlignment="Right" />
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+
+                            <Button Click="AppFullClose_Click">
+                                <!--#region CommandParameter -->
+                                <Button.CommandParameter>
+                                    <DockPanel MaxWidth="300" Margin="16" Background="Transparent">
+                                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 12">
+                                            <materialDesign:PackIcon VerticalAlignment="Center" Width="28" Height="28" Margin="0 0 8 0" Kind="AlertCircleOutline"
+                                                    Foreground="{StaticResource ColorWarning}" />
+                                            <TextBlock FontSize="{StaticResource Header}" Text="該批資料尚未結批，是否確定結束程式？" TextWrapping="WrapWithOverflow" Width="260" />
+                                        </StackPanel>
+
+                                        <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Content="取消"
+                                                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" Foreground="{StaticResource ColorInfo}"
+                                                BorderBrush="{StaticResource ColorInfo}" Style="{StaticResource MaterialDesignOutlinedButton}">
+                                            <Button.CommandParameter>
+                                                <sys:Boolean>False</sys:Boolean>
+                                            </Button.CommandParameter>
+                                        </Button>
+
+                                        <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Margin="12 0" Content="確定"
+                                                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" Foreground="{StaticResource ColorInfo}"
+                                                BorderBrush="{StaticResource ColorInfo}" Style="{StaticResource MaterialDesignOutlinedButton}">
+                                            <Button.CommandParameter>
+                                                <sys:Boolean>True</sys:Boolean>
+                                            </Button.CommandParameter>
+                                        </Button>
+                                    </DockPanel>
+                                </Button.CommandParameter>
+                                <!--#endregion-->
+
+                                <!--#region Content -->
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <materialDesign:PackIcon Width="24" Height="18" Kind="Shutdown" VerticalAlignment="Center" />
+                                        <TextBlock MinWidth="80" Margin="8 0 0 0" Text="關閉程式" VerticalAlignment="Center" TextAlignment="Right" />
+                                    </StackPanel>
+                                </Button.Content>
+                                <!--#endregion-->
+                            </Button>
+                        </StackPanel>
+                    </materialDesign:PopupBox>
+                    <!--#endregion-->
+                </StackPanel>
+            </Border>
+            <!--#endregion-->
+
+            <!--#region Dialog，考慮建立物件來 Binding -->
+            <materialDesign:DialogHost Grid.Row="1" x:Name="LoginDialog" Identifier="MainDialog" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" CloseOnClickAway="False"
+                    OverlayBackground="{DynamicResource ColorBlueGrayTranparent}" KeyUp="LoginDialog_KeyUp" DialogTheme="Dark" DialogOpened="DialogHost_DialogOpened"
+                    DialogClosing="DialogHost_DialogClosing" />
+            <!--#endregion-->
+
+            <!--#region FooterBar -->
+            <DockPanel DockPanel.Dock="Bottom" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="{StaticResource ColorGrayTransparent}"
+                    FlowDirection="LeftToRight" DataContext="{StaticResource MsgInformer}">
+                <!--#region Error & Warning Popupbox -->
+                <materialDesign:PopupBox x:Name="ErrPopupBox" DockPanel.Dock="Right" Padding="0" StaysOpen="True" materialDesign:RippleAssist.IsDisabled="True"
+                        materialDesign:ShadowAssist.ShadowDepth="Depth1" TabIndex="-1" Opened="ErrPopupBox_Opened" Closed="PopupBox_Closed" PlacementMode="TopAndAlignRightEdges"
+                        FlowDirection="LeftToRight" Focusable="False">
+                    <materialDesign:PopupBox.ToggleContent>
+                        <StackPanel Orientation="Horizontal" Margin="12 0" Height="32">
+                            <materialDesign:PackIcon Kind="Alert" Width="20" Height="20" VerticalAlignment="Center">
+                                <materialDesign:PackIcon.Style>
+                                    <Style TargetType="materialDesign:PackIcon">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding NewError, Converter={StaticResource NotZeroConverter}}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource ColorDeepOrange}"></Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        <Setter Property="Foreground" Value="{StaticResource ColorSecondary}" />
+                                    </Style>
+                                </materialDesign:PackIcon.Style>
+                            </materialDesign:PackIcon>
+
+                            <TextBlock Margin="8 0 0 0" VerticalAlignment="Center" Text="{Binding NewError}" FontSize="16">
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding NewError, Converter={StaticResource NotZeroConverter}}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource ColorDeepOrange}"></Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        <Setter Property="Foreground" Value="{StaticResource ColorSecondary}" />
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </materialDesign:PopupBox.ToggleContent>
+                    <!--//-->
+                    <StackPanel Orientation="Vertical">
+                        <ListView Width="480" MaxHeight="640" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                ScrollViewer.CanContentScroll="True" ItemsSource="{Binding ErrSource, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+
+                            <ListView.Resources>
+                                <Style TargetType="{x:Type GridViewColumnHeader}" BasedOn="{StaticResource MaterialDesignFlatAccentButton}">
+                                    <Setter Property="Cursor" Value="Arrow" />
+                                    <Setter Property="FontWeight" Value="Bold" />
+                                    <Setter Property="Foreground" Value="{StaticResource ColorDeepOrange}" />
+                                    <Setter Property="FontSize" Value="16" />
+                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                    <Setter Property="BorderBrush" Value="LightGray" />
+                                    <Setter Property="BorderThickness" Value="1 0 1 1" />
+                                    <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="0" />
+                                </Style>
+                            </ListView.Resources>
+                            <!--//-->
+                            <ListView.View>
+                                <GridView AllowsColumnReorder="False">
+                                    <GridViewColumn Header="Code" Width="120">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Code}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"
+                                                        Foreground="{Binding MsgColor}" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Message" Width="360">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Description}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"
+                                                        TextWrapping="Wrap" Foreground="{Binding MsgColor}" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                        <!--//-->
+                        <Button x:Name="MessageClearBtn" Margin="0 12 0 0" HorizontalAlignment="Right" Click="ErrClearBtn_Click" Focusable="False" Foreground="Gray"
+                                Style="{StaticResource MaterialDesignFlatButton}">
+                            <materialDesign:PackIcon Kind="TrashCan" Width="30" Height="26" />
+                        </Button>
+                    </StackPanel>
+                </materialDesign:PopupBox>
+                <!--#endregion-->
+
+                <!--#region Information Popupbox -->
+                <materialDesign:PopupBox x:Name="InfoPopupbox" DockPanel.Dock="Right" Padding="0" StaysOpen="True" materialDesign:RippleAssist.IsDisabled="True"
+                        materialDesign:ShadowAssist.ShadowDepth="Depth1" TabIndex="-1" Opened="InfoPopupbox_Opened" Closed="PopupBox_Closed" PlacementMode="TopAndAlignRightEdges"
+                        FlowDirection="LeftToRight" Focusable="False">
+                    <materialDesign:PopupBox.ToggleContent>
+                        <StackPanel Orientation="Horizontal" Margin="12 0" Height="32">
+                            <materialDesign:PackIcon Kind="Information" Width="20" Height="20" VerticalAlignment="Center">
+                                <materialDesign:PackIcon.Style>
+                                    <Style TargetType="materialDesign:PackIcon">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding NewInfo, Converter={StaticResource NotZeroConverter}}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource ColorInfo}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        <Setter Property="Foreground" Value="{StaticResource ColorSecondary}" />
+                                    </Style>
+                                </materialDesign:PackIcon.Style>
+                            </materialDesign:PackIcon>
+
+                            <TextBlock Margin="8 0 0 0" VerticalAlignment="Center" Text="{Binding NewInfo}" FontSize="16">
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding NewInfo, Converter={StaticResource NotZeroConverter}}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource ColorInfo}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        <Setter Property="Foreground" Value="{StaticResource ColorSecondary}" />
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </materialDesign:PopupBox.ToggleContent>
+                    <!--//-->
+                    <StackPanel Orientation="Vertical">
+                        <ListView Width="480" MaxHeight="640" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                ScrollViewer.CanContentScroll="True" ItemsSource="{Binding InfoSource, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ListView.Resources>
+                                <Style TargetType="{x:Type GridViewColumnHeader}" BasedOn="{StaticResource MaterialDesignFlatAccentButton}">
+                                    <Setter Property="Cursor" Value="Arrow" />
+                                    <Setter Property="FontWeight" Value="Bold" />
+                                    <Setter Property="Foreground" Value="{StaticResource ColorInfo}" />
+                                    <Setter Property="FontSize" Value="16" />
+                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                    <Setter Property="BorderBrush" Value="LightGray" />
+                                    <Setter Property="BorderThickness" Value="1 0 1 1" />
+                                    <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="0" />
+                                </Style>
+                            </ListView.Resources>
+                            <!--//-->
+                            <ListView.View>
+                                <GridView AllowsColumnReorder="False">
+                                    <GridViewColumn Header="Code" Width="120">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Code}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"
+                                                        Foreground="{Binding MsgColor}" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Message" Width="360">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Description}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"
+                                                        TextWrapping="Wrap" Foreground="{Binding MsgColor}" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                        <!--//-->
+                        <Button x:Name="InfoClearBtn" Margin="0 12 0 0" HorizontalAlignment="Right" Click="InfoClearBtn_Click" Focusable="False" Foreground="Gray"
+                                Style="{StaticResource MaterialDesignFlatButton}">
+                            <materialDesign:PackIcon Kind="TrashCan" Width="30" Height="26" />
+                        </Button>
+                    </StackPanel>
+                </materialDesign:PopupBox>
+                <!--#endregion-->
+
+                <!--內部資料，Binding 進 MsgInformer-->
+                <!--#region Progress Bar -->
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <!--<DataTrigger Binding="{Binding ProgressValue, RelativeSource={RelativeSource AncestorType=Window,Mode=FindAncestor}, FallbackValue=0}" Value="100">-->
+                                <DataTrigger Binding="{Binding ProgressValue}" Value="100">
+                                    <DataTrigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <!--// 淡出，時間 3 秒-->
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:1.5" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </DataTrigger.EnterActions>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+
+                    <!--#region Progress Bar -->
+                    <ProgressBar x:Name="MainProgress" Margin="8 0 0 0" Height="6" BorderThickness="0" BorderBrush="Gray" materialDesign:TransitionAssist.DisableTransitions="True"
+                            HorizontalAlignment="Left" Foreground="{StaticResource ColorBrown}" Background="{StaticResource ColorBrownTransparent}" Minimum="0" Maximum="100"
+                            Width="250" />
+
+                    <TextBlock x:Name="MainProgressText" Margin="8 0 0 0" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{StaticResource ColorBrown}"
+                            Text="{Binding Value, ElementName=MainProgress, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=0, StringFormat={}{0:0} %}" />
+                    <!--#endregion-->
+                </StackPanel>
+                <!--#endregion-->
+            </DockPanel>
+            <!--#endregion-->
+        </Grid>
+    </Border>
+</Window>
