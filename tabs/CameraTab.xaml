@@ -1,0 +1,884 @@
+﻿<StackPanel x:Class="MCAJawIns.Tab.CameraTab" 
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+            xmlns:app="clr-namespace:MCAJawIns"
+            xmlns:local="clr-namespace:MCAJawIns.Tab" 
+            xmlns:ctrl="clr-namespace:MCAJawIns.Control" 
+            xmlns:sys="clr-namespace:System;assembly=mscorlib" 
+
+            mc:Ignorable="d"
+            d:DesignHeight="900" 
+            d:DesignWidth="1600" 
+            UseLayoutRounding="False" 
+            Orientation="Vertical" 
+            d:DataContext="{d:DesignInstance Type=local:CameraTab}"
+            Loaded="StackPanel_Loaded">
+    <Grid Style="{StaticResource TabGrid}">
+        <!--#region Layout -->
+        <Grid.ColumnDefinitions>
+            <!--1st-->
+            <ColumnDefinition Width="auto" />
+            <!--Separator-->
+            <ColumnDefinition Width="auto" />
+            <!--2nd-->
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <!--#endregion-->
+
+        <!--#region 1st Col -->
+        <StackPanel Grid.Column="0" Width="300" Orientation="Vertical" VerticalAlignment="Top" Background="{x:Null}">
+            <!--#region 相機選擇 -->
+            <ctrl:CustomCard Title="相機選擇" IconKind="CameraOutline" Background="Linen">
+                <DockPanel HorizontalAlignment="Stretch">
+                    <ComboBox x:Name="CameraSelector" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4 4" Padding="8 3" MinWidth="180" Height="24" FontWeight="Bold"
+                            Style="{StaticResource MaterialDesignOutlinedComboBox}" materialDesign:HintAssist.Hint="Camera" materialDesign:ComboBoxAssist.ShowSelectedItem="False"
+                            materialDesign:HintAssist.Background="{Binding Background,RelativeSource={RelativeSource AncestorType=ctrl:CustomCard}, UpdateSourceTrigger=PropertyChanged}"
+                            ItemsSource="{Binding CamsSource, Source={StaticResource CameraEnumer}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                            MouseRightButtonUp="CameraSelector_MouseRightButtonUp">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock TextAlignment="Center">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0}, {1}">
+                                            <Binding Path="Model" UpdateSourceTrigger="PropertyChanged" Mode="OneWay" />
+                                            <Binding Path="SerialNumber" UpdateSourceTrigger="PropertyChanged" Mode="OneWay" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <!--//-->
+                    <Button x:Name="picon" DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="4 0" Padding="0"
+                            Width="{Binding Height, RelativeSource={RelativeSource Mode=Self}, Mode=OneWay}" Height="24" materialDesign:ButtonAssist.CornerRadius="13"
+                            IsEnabled="{Binding SelectedIndex, ElementName=CameraSelector, Converter={StaticResource NumberNotEqualConverter}, ConverterParameter=-1}"
+                            Style="{StaticResource MaterialDesignFlatButton}" Click="CameraAdd_Click">
+                        <materialDesign:PackIcon Kind="PlusCircleOutline" Width="24" Height="24" />
+                    </Button>
+                </DockPanel>
+            </ctrl:CustomCard>
+            <!--#endregion-->
+
+            <!--#region 組態列表 -->
+            <ctrl:CustomCard ShowHeader="False" Background="AntiqueWhite">
+                <ItemsControl ItemsSource="{Binding CameraConfigs, Source={StaticResource CameraEnumer}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                        AlternationCount="{Binding CameraConfigs.Count, Source={StaticResource CameraEnumer}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
+                    <!--{Binding CameraConfigs.Count, Source={StaticResource CameraEnumer}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}-->
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Margin="0 0" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <!--//-->
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter" />
+                    </ItemsControl.ItemContainerStyle>
+                    <!--//-->
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <RadioButton HorizontalAlignment="Stretch" Padding="0 0" FontWeight="Bold" GroupName="GroupChoiceChip" Checked="RadioButton_Checked"
+                                    CommandParameter="{Binding SerialNumber}">
+                                <!--#region Style -->
+                                <RadioButton.Style>
+                                    <Style TargetType="{x:Type RadioButton}" BasedOn="{StaticResource MaterialDesignChoiceChipPrimaryOutlineRadioButton}">
+                                        <Setter Property="Margin" Value="4 8" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Model}" Value="">
+                                                <Setter Property="Content" Value="(NULL)" />
+                                            </DataTrigger>
+                                            <!--//-->
+                                            <DataTrigger Value="True">
+                                                <DataTrigger.Binding>
+                                                    <MultiBinding Converter="{StaticResource NumbersAllEqualConverter}">
+                                                        <Binding Path="(ItemsControl.AlternationIndex)" RelativeSource="{RelativeSource Mode=TemplatedParent}" />
+                                                        <Binding Path="CameraConfigs.Count" Source="{StaticResource CameraEnumer}" UpdateSourceTrigger="PropertyChanged"
+                                                                Mode="OneWay" Converter="{StaticResource MathMinusConverter}" ConverterParameter="1" />
+                                                    </MultiBinding>
+                                                </DataTrigger.Binding>
+                                                <Setter Property="Margin" Value="4 8 4 4" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </RadioButton.Style>
+                                <!--#endregion-->
+
+                                <RadioButton.Content>
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Width="26" Height="auto" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                            <materialDesign:PackIcon.Style>
+                                                <Style TargetType="materialDesign:PackIcon">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Online, Mode=OneWay}" Value="True">
+                                                            <Setter Property="Kind" Value="Link" />
+                                                            <Setter Property="Foreground" Value="{StaticResource ColorSuccess}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                    <Setter Property="Kind" Value="LinkOff" />
+                                                    <Setter Property="Foreground" Value="{StaticResource ColorError}" />
+                                                </Style>
+                                            </materialDesign:PackIcon.Style>
+                                        </materialDesign:PackIcon>
+                                        <!--//-->
+                                        <TextBlock VerticalAlignment="Center" Margin="4 0 0 0" MaxWidth="200" TextTrimming="CharacterEllipsis">
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="{}{0,12}, S/N: {1,8:D0}">
+                                                    <Binding Path="Model" Converter="{StaticResource StringEllipsisConverter}" ConverterParameter="12"/>
+                                                    <Binding Path="SerialNumber" />
+                                                    <!--<Binding Path="(ItemsControl.AlternationIndex)" RelativeSource="{RelativeSource Mode=TemplatedParent}"/>-->
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                        <!--//-->
+                                        <Button Margin="8 0 0 0" Padding="0" Width="26" Height="auto" materialDesign:ButtonAssist.CornerRadius="13"
+                                                materialDesign:RippleAssist.IsDisabled="True" Content="{materialDesign:PackIcon Kind=Close}" Click="RadioDelButton_Click"
+                                                CommandParameter="{Binding SerialNumber}">
+                                            <Button.Style>
+                                                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignToolButton}">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Foreground" Value="{StaticResource ColorError}" />
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </StackPanel>
+                                </RadioButton.Content>
+                            </RadioButton>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!--#region Footer -->
+                <ctrl:CustomCard.Footer>
+                    <Button x:Name="CameraConfigSave" HorizontalAlignment="Right" Margin="4 4" Height="24" Focusable="False" materialDesign:ButtonAssist.CornerRadius="12"
+                            SnapsToDevicePixels="True"
+                            Click="CameraConfigSave_Click">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                                <Setter Property="BorderBrush" Value="{StaticResource ColorOrange}" />
+                                <Setter Property="Foreground" Value="{StaticResource ColorOrange}" />
+                                <Setter Property="Content">
+                                    <Setter.Value>
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialDesign:PackIcon Kind="ExclamationBold" />
+                                            <TextBlock Margin="4 0 0 0" Text="儲存" />
+                                        </StackPanel>
+                                    </Setter.Value>
+                                </Setter>
+                                <!--//-->
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CameraCofingSaved, Source={StaticResource CameraEnumer}}" Value="True">
+                                        <Setter Property="BorderBrush" Value="{StaticResource ColorSuccess}" />
+                                        <Setter Property="Foreground" Value="{StaticResource ColorSuccess}" />
+                                        <Setter Property="Content">
+                                            <Setter.Value>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <materialDesign:PackIcon Kind="CheckBold" />
+                                                    <TextBlock Margin="4 0 0 0" Text="儲存" />
+                                                </StackPanel>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </ctrl:CustomCard.Footer>
+                <!--#endregion-->
+            </ctrl:CustomCard>
+            <!--#endregion-->
+
+            <!--<Button HorizontalAlignment="Right" Content="切換" Style="{StaticResource MaterialDesignFlatButton}" Click="TestSwitch" />-->
+        </StackPanel>
+        <!--#endregion-->
+
+        <!-- Separator -->
+        <Separator Grid.Column="1" Grid.RowSpan="100" Margin="0" Width="1" Background="{StaticResource ColorSecondaryTransparent}"
+                Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+
+        <!--#region 2nd Col -->
+        <StackPanel Grid.Column="2" Orientation="Vertical" VerticalAlignment="Top" Background="{x:Null}">
+            <!--#region 相機設定 -->
+            <ctrl:CustomCard x:Name="CameraCard" Title="相機組態" IconKind="CardBulletedOutline" Background="WhiteSmoke" d:DataContext="{d:DesignInstance Type=app:CameraConfig}"
+                    DataContextChanged="CameraCard_DataContextChanged">
+                <DockPanel HorizontalAlignment="Stretch">
+                    <!--#region Camera Info Grid x:Name="CameraInfoGrid" -->
+                    <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch" Margin="4 0">
+                        <!--#region Resources -->
+                        <Grid.Resources>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MaterialDesignBody2TextBlock}">
+                                <Setter Property="HorizontalAlignment" Value="Left" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="TextAlignment" Value="Right" />
+                                <Setter Property="MinWidth" Value="120" />
+                            </Style>
+                            <!-- // -->
+                            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
+                                <Setter Property="Margin" Value="0 4" />
+                                <Setter Property="Height" Value="24" />
+                                <Setter Property="TextAlignment" Value="Center" />
+                                <Setter Property="IsReadOnly" Value="True" />
+                                <Setter Property="Focusable" Value="False" />
+                            </Style>
+                            <!-- // -->
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="Padding" Value="16 0" />
+                                <Setter Property="Margin" Value="0 0 12 0" />
+                                <Setter Property="Foreground" Value="{StaticResource ColorInfo}" />
+                            </Style>
+                        </Grid.Resources>
+                        <!--#endregion-->
+
+                        <!--#region Layout -->
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <!--<RowDefinition Height="auto"/>-->
+                        </Grid.RowDefinitions>
+                        <!--//-->
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="1*" />
+                            <!--<ColumnDefinition Width="2*"/>-->
+                        </Grid.ColumnDefinitions>
+                        <!--#endregion-->
+
+                        <!--#region 開啟 / 關閉相機, 1st Col -->
+                        <Border x:Name="CameraStatusBorder" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="16 4" CornerRadius="12" SnapsToDevicePixels="True"
+                                d:DataContext="{d:DesignInstance Type={x:Type app:BaslerCam}}">
+                            <Border.Style>
+                                <Style TargetType="{x:Type Border}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=IsOpen}" Value="True">
+                                            <Setter Property="Background" Value="{StaticResource ColorSuccess}" />
+                                            <!--<Setter Property="TextBlock.Text" Value="已連線" />-->
+                                            <!--<Setter Property="TextBlock.Foreground" Value="Black" />-->
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                    <Setter Property="Background" Value="{StaticResource ColorError}" />
+                                    <!--<Setter Property="TextBlock.Text" Value="未連線" />-->
+                                    <!--<Setter Property="TextBlock.Foreground" Value="Black" />-->
+                                </Style>
+                            </Border.Style>
+                            <!--//-->
+                            <TextBlock Foreground="White" FontSize="14" FontWeight="SemiBold">
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Path=IsOpen}" Value="True">
+                                                <Setter Property="Text" Value="已連線" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        <Setter Property="Text" Value="未連線" />
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Border>
+                        <!-- // 開啟相機-->
+                        <Button x:Name="CameraOpen" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" Margin="0 0" Padding="16 0" Content="開啟相機"
+                                materialDesign:ButtonAssist.CornerRadius="16" d:DataContext="{d:DesignInstance Type=app:BaslerCam}" Click="CameraOpen_Click">
+                            <Button.IsEnabled>
+                                <!--條件: 相機未開啟 & S/N 已選擇-->
+                                <MultiBinding Converter="{StaticResource BooleanAndGate}">
+                                    <Binding Path="IsOpen" Converter="{StaticResource BooleanInverter}" UpdateSourceTrigger="PropertyChanged" />
+                                    <Binding Path="DataContext.SerialNumber" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ctrl:CustomCard, AncestorLevel=1}"
+                                            Converter="{StaticResource StringNotNullOrEmptyConverter}" />
+                                </MultiBinding>
+                            </Button.IsEnabled>
+                        </Button>
+                        <!-- // -->
+                        <Button x:Name="CameraClose" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" Margin="0 0" Padding="16 0" Content="關閉相機"
+                                materialDesign:ButtonAssist.CornerRadius="16" d:DataContext="{d:DesignInstance Type=app:BaslerCam}"
+                                IsEnabled="{Binding Path=IsOpen, UpdateSourceTrigger=PropertyChanged, FallbackValue=False}" Click="CameraClose_Click" />
+                        <!--#endregion-->
+
+                        <!--#region Camera Info, 2nd Col ~~ -->
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Vendor Name" TextAlignment="Right" />
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text="Model" TextAlignment="Right" />
+                        <TextBlock Grid.Row="2" Grid.Column="2" Text="Camera Type" TextAlignment="Right" />
+
+                        <TextBox Grid.Row="0" Grid.Column="3" Margin="0 4 0 8" Padding="0 3" Text="{Binding VendorName, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox Grid.Row="1" Grid.Column="3" Margin="0 8" Padding="0 3" Text="{Binding Model, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox Grid.Row="2" Grid.Column="3" Margin="0 8 0 4" Padding="0 3" Text="{Binding CameraType, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <!--量測用-->
+                        <!--<TextBlock Grid.Row="0" Grid.RowSpan="100" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" TextAlignment="Center" FontSize="24"
+                                Foreground="Blue" Background="{StaticResource ColorPurpleTransparent}"
+                                Text="{Binding ActualWidth, RelativeSource={RelativeSource Mode=Self}, UpdateSourceTrigger=PropertyChanged}" />-->
+                        <!--//-->
+                        <TextBlock Grid.Row="0" Grid.Column="5" Text="S/N" />
+                        <TextBlock Grid.Row="1" Grid.Column="5" Text="IP" />
+                        <TextBlock Grid.Row="2" Grid.Column="5" Text="MAC" />
+
+                        <TextBox Grid.Row="0" Grid.Column="6" Margin="0 4 0 8" Padding="0 3" FontWeight="SemiBold" Foreground="{StaticResource ColorPrimary}"
+                                Text="{Binding SerialNumber, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox Grid.Row="1" Grid.Column="6" Margin="0 8" Padding="0 3" Text="{Binding IP, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox Grid.Row="2" Grid.Column="6" Margin="0 8 0 4" Padding="0 3" Text="{Binding MAC, UpdateSourceTrigger=PropertyChanged}" />
+                        
+                        <!--量測用-->
+                        <!--<TextBlock Grid.Row="0" Grid.RowSpan="100" Grid.Column="5" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" TextAlignment="Center" FontSize="24"
+                                Foreground="Blue" Background="{StaticResource ColorPurpleTransparent}"
+                                Text="{Binding ActualWidth, RelativeSource={RelativeSource Mode=Self}, UpdateSourceTrigger=PropertyChanged}" />-->
+                        <!--//-->
+
+                        <TextBlock Grid.Row="0" Grid.Column="8" Text="Pixel Size" />
+                        <TextBox Grid.Row="0" Grid.Column="9" Margin="0 8" Padding="8 3" IsReadOnly="False" Focusable="True" FontWeight="SemiBold"
+                                Foreground="{StaticResource ColorSuccess}" Text="{Binding PixelSize, UpdateSourceTrigger=LostFocus, Mode=TwoWay, StringFormat={}{0:0.##}}"
+                                materialDesign:TextFieldAssist.SuffixText="µm" GotFocus="TextBox_GotFocus" GotMouseCapture="TextBox_GotMouseCapture" />
+
+                        <!--量測用-->
+                        <!--<TextBlock Grid.Row="0" Grid.RowSpan="100" Grid.Column="8" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" TextAlignment="Center" FontSize="24"
+                                Foreground="Blue" Background="{StaticResource ColorPurpleTransparent}"
+                                Text="{Binding ActualWidth, RelativeSource={RelativeSource Mode=Self}, UpdateSourceTrigger=PropertyChanged}" />-->
+
+                        <!-- Separators -->
+                        <Separator Grid.Column="1" Grid.RowSpan="100" Margin="12 4" Width="1" Background="{StaticResource ColorBlueGrayTranparent}"
+                                Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+
+                        <Separator Grid.Column="4" Grid.RowSpan="100" Margin="12 4" Width="1" Background="{StaticResource ColorBlueGrayTranparent}"
+                                Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+
+                        <Separator Grid.Column="7" Grid.RowSpan="100" Margin="12 4" Width="1" Background="{StaticResource ColorBlueGrayTranparent}"
+                                Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                        <!--#endregion-->
+                    </Grid>
+                    <!--#endregion-->
+                    <Separator DockPanel.Dock="Top" Margin="4 4" />
+                    <!--#region 目標特徵選擇 -->
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4 4">
+                        <!--#region Resources -->
+                        <StackPanel.Resources>
+                            <ObjectDataProvider x:Key="DataFromEunm" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+                                <ObjectDataProvider.MethodParameters>
+                                    <x:Type TypeName="app:TargetFeature" />
+                                </ObjectDataProvider.MethodParameters>
+                            </ObjectDataProvider>
+                        </StackPanel.Resources>
+                        <!--#endregion-->
+
+                        <TextBlock Margin="0 0 12 0" VerticalAlignment="Center" FontSize="16" FontWeight="Bold" Text="目標特徵: " />
+
+                        <ComboBox x:Name="TgtSelector" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="8 3" MinWidth="135" Height="24" FontWeight="Bold"
+                                Style="{StaticResource MaterialDesignOutlinedComboBox}" ItemsSource="{Binding Source={StaticResource DataFromEunm}, Mode=OneWay}"
+                                materialDesign:ComboBoxAssist.ClassicMode="False" materialDesign:ComboBoxAssist.ShowSelectedItem="True"
+                                SelectedItem="{Binding TargetFeature, UpdateSourceTrigger=PropertyChanged, FallbackValue={x:Null}}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+                    <!--#endregion-->
+                    <Separator DockPanel.Dock="Top" Margin="4 4" />
+                    <!--#region Change Tab -->
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4 4">
+                        <StackPanel.Resources>
+                            <Style TargetType="{x:Type RadioButton}" BasedOn="{StaticResource MaterialDesignTabRadioButton}">
+                                <Setter Property="Margin" Value="0 0" />
+                                <Setter Property="Height" Value="24" />
+                                <Setter Property="MinHeight" Value="0" />
+                                <Setter Property="FontWeight" Value="Bold" />
+                                <Setter Property="Cursor" Value="Hand" />
+                            </Style>
+                        </StackPanel.Resources>
+
+                        <RadioButton IsChecked="True" Content="CAMERA" Checked="ChangeCameraFunctionRadioButton_Checked">
+                            <RadioButton.CommandParameter>
+                                <sys:Int32>0</sys:Int32>
+                            </RadioButton.CommandParameter>
+                        </RadioButton>
+                        <RadioButton Content="LENS" Checked="ChangeCameraFunctionRadioButton_Checked">
+                            <RadioButton.CommandParameter>
+                                <sys:Int32>1</sys:Int32>
+                            </RadioButton.CommandParameter>
+                        </RadioButton>
+                    </StackPanel>
+                    <!--#endregion-->
+                    <Separator DockPanel.Dock="Top" Margin="4 4" />
+                    <!--#region TabControl -->
+                    <TabControl DockPanel.Dock="Top" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0 -2 0 0" Padding="0" Background="{x:Null}"
+                            BorderBrush="{x:Null}" BorderThickness="0"
+                            SelectedIndex="{Binding CameraFuncTab, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:CameraTab, AncestorLevel=1}}">
+                        <!--#region Resources -->
+                        <TabControl.Resources>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                                <Setter Property="Margin" Value="12 0 0 0" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="Background" Value="{x:Null}" />
+                                <Setter Property="Foreground" Value="{StaticResource ColorSuccess}" />
+                                <Setter Property="materialDesign:RippleAssist.IsDisabled" Value="True" />
+                                <Setter Property="materialDesign:ShadowAssist.ShadowDepth" Value="Depth0" />
+                                <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="10" />
+                                <!--<Setter Property="BorderThickness" Value="0" />-->
+                                <Setter Property="SnapsToDevicePixels" Value="True" />
+                                <!--//-->
+                                <Style.Triggers>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter Property="Foreground" Value="{StaticResource ColorTeal}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TabControl.Resources>
+                        <!--#endregion-->
+
+                        <!--#region TabItem1 -->
+                        <TabItem Header="{x:Null}" Margin="0 0" Height="0">
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="4 4">
+                                    <!--#region UserSet Actions -->
+                                    <TextBox HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 0" Padding="8 3" MinWidth="135" Height="24" TextAlignment="Center"
+                                            FontWeight="Bold" IsReadOnly="True" materialDesign:HintAssist.Hint="UserSet Now" Focusable="False" Cursor="Arrow"
+                                            Style="{StaticResource MaterialDesignOutlinedTextBox}" Text="{Binding UserSetRead, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <!--UserSet select-->
+                                    <ComboBox HorizontalAlignment="Left" VerticalAlignment="Center" Margin="16 0 0 0" Padding="8 3" MinWidth="135" Height="24" FontWeight="SemiBold"
+                                            materialDesign:HintAssist.Hint="UserSet" materialDesign:ComboBoxAssist.ShowSelectedItem="False"
+                                            SelectedItem="{Binding UserSet, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                            ItemsSource="{Binding UserSetEnum, UpdateSourceTrigger=PropertyChanged}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock TextAlignment="Center" Text="{Binding}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                    <!--//-->
+                                    <StackPanel x:Name="UserSetActionPanel" Orientation="Horizontal" d:DataContext="{d:DesignInstance Type=app:BaslerCam}">
+                                        <!--指定 UserSet 設為預設 -->
+                                        <Button Height="auto" Content="設為預設" Click="SetDefaultUserSet_Click">
+                                            <!--IsEnabled="{Binding IsOpen, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"-->
+                                            <Button.IsEnabled>
+                                                <MultiBinding Converter="{StaticResource BooleanAndGate}">
+                                                    <!--Camera IsOpen-->
+                                                    <Binding Path="IsOpen" UpdateSourceTrigger="PropertyChanged" />
+                                                    <!--Relative CameraCard Source, 確認 SerialNumber 不為空-->
+                                                    <Binding Path="DataContext.SerialNumber"
+                                                            RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ctrl:CustomCard, AncestorLevel=1}"
+                                                            Converter="{StaticResource StringNotNullOrEmptyConverter}" />
+                                                </MultiBinding>
+                                            </Button.IsEnabled>
+                                        </Button>
+                                        <!--讀取 UserSet-->
+                                        <Button Height="auto" Content="讀取" Click="ReadUserSet_Click">
+                                            <!--IsEnabled="{Binding IsOpen, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"-->
+                                            <Button.IsEnabled>
+                                                <MultiBinding Converter="{StaticResource BooleanAndGate}">
+                                                    <!--Camera IsOpen-->
+                                                    <Binding Path="IsOpen" UpdateSourceTrigger="PropertyChanged" />
+                                                    <!--Relative CameraCard Source, 確認 SerialNumber 不為空-->
+                                                    <Binding Path="DataContext.SerialNumber"
+                                                            RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ctrl:CustomCard, AncestorLevel=1}"
+                                                            Converter="{StaticResource StringNotNullOrEmptyConverter}" />
+                                                </MultiBinding>
+                                            </Button.IsEnabled>
+                                        </Button>
+                                        <!--寫入 UserSet-->
+                                        <Button Height="auto" Content="寫入" Click="WriteUserSet_Click">
+                                            <!--IsEnabled="{Binding IsOpen, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"-->
+                                            <Button.IsEnabled>
+                                                <MultiBinding Converter="{StaticResource BooleanAndGate}">
+                                                    <!--// Camera IsOpen-->
+                                                    <Binding Path="IsOpen" UpdateSourceTrigger="PropertyChanged" />
+                                                    <!--// Relative CameraCard Source, 確認 SerialNumber 不為空-->
+                                                    <Binding Path="DataContext.SerialNumber"
+                                                            RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ctrl:CustomCard, AncestorLevel=1}"
+                                                            Converter="{StaticResource StringNotNullOrEmptyConverter}" />
+                                                </MultiBinding>
+                                            </Button.IsEnabled>
+                                        </Button>
+                                    </StackPanel>
+                                    <!--#endregion-->
+                                </StackPanel>
+                                <!--//-->
+                                <Separator Margin="4 4" />
+                                <!--//-->
+                                <Grid x:Name="CameraGrid" HorizontalAlignment="Stretch" Margin="4 4">
+                                    <!--#region Resources -->
+                                    <Grid.Resources>
+                                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MaterialDesignBody2TextBlock}">
+                                            <Setter Property="HorizontalAlignment" Value="Left" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Setter Property="Margin" Value="8 8 0 8" />
+                                            <Setter Property="Padding" Value="0 4" />
+                                            <Setter Property="MinWidth" Value="120" />
+                                            <Setter Property="Height" Value="24" />
+                                            <!--<Setter Property="Background" Value="{StaticResource ColorErrorTransparent}" />-->
+                                        </Style>
+                                        <!-- // -->
+                                        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
+                                            <Setter Property="HorizontalAlignment" Value="Left" />
+                                            <Setter Property="Margin" Value="0 8" />
+                                            <Setter Property="MinWidth" Value="120" />
+                                            <Setter Property="Height" Value="24" />
+                                            <Setter Property="TextAlignment" Value="Center" />
+                                        </Style>
+                                        <!-- // -->
+                                        <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
+                                            <Setter Property="HorizontalAlignment" Value="Left" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Setter Property="Padding" Value="8 3" />
+                                            <Setter Property="MinWidth" Value="120" />
+                                            <Setter Property="Height" Value="24" />
+                                            <Setter Property="FontWeight" Value="Bold" />
+                                            <Setter Property="materialDesign:ComboBoxAssist.ShowSelectedItem" Value="False" />
+                                        </Style>
+                                    </Grid.Resources>
+                                    <!--#endregion-->
+
+                                    <!--#region Layout -->
+                                    <Grid.RowDefinitions>
+                                        <!-- 0~1 -->
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <!-- 2~4 -->
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <!-- 5~7 -->
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <!-- 8~10 -->
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <!-- 11~13 -->
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                    </Grid.RowDefinitions>
+                                    <!--//-->
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="auto" />
+                                        <!--separetor-->
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="auto" />
+                                        <!--separetor-->
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions >
+                                    <!--#endregion-->
+
+                                    <!--#region AOI Controls -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" FontFamily="Consolas" FontSize="16" FontWeight="Bold"
+                                            Style="{StaticResource MaterialDesignSubtitle1TextBlock}" Text="AOI Controls" />
+                                    <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 8 0 0" Height="1" />
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Sensor Width" />
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Sensor Height" />
+
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Max Width" />
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Max Height" />
+                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="Width" />
+                                    <TextBlock Grid.Row="7" Grid.Column="0" Text="Height" />
+
+                                    <TextBlock Grid.Row="8" Grid.Column="0" Text="X Offset" />
+                                    <TextBlock Grid.Row="9" Grid.Column="0" Text="Y Offset" />
+
+                                    <TextBlock Grid.Row="10" Grid.Column="0" Text="Center X" />
+                                    <TextBlock Grid.Row="11" Grid.Column="0" Text="Center Y" />
+                                    <!--//-->
+                                    <TextBlock Grid.Row="2" Grid.Column="1" TextAlignment="Center" Text="{Binding SensorWidth, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBlock Grid.Row="3" Grid.Column="1" TextAlignment="Center" Text="{Binding SensorHeight, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <TextBlock Grid.Row="4" Grid.Column="1" TextAlignment="Center" Text="{Binding MaxWidth, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBlock Grid.Row="5" Grid.Column="1" TextAlignment="Center" Text="{Binding MaxHeight, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <TextBox Grid.Row="6" Grid.Column="1" Padding="8 3" Text="{Binding Width, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            GotFocus="TextBox_GotFocus" GotMouseCapture="TextBox_GotMouseCapture" />
+                                    <TextBox Grid.Row="7" Grid.Column="1" Padding="8 3" Text="{Binding Height, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            GotFocus="TextBox_GotFocus" GotMouseCapture="TextBox_GotMouseCapture" />
+
+                                    <TextBox Grid.Row="8" Grid.Column="1" Padding="8 3" IsEnabled="{Binding CenterX, Converter={StaticResource BooleanInverter}}"
+                                            Text="{Binding OffsetX, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" GotFocus="TextBox_GotFocus"
+                                            GotMouseCapture="TextBox_GotMouseCapture" />
+                                    <TextBox Grid.Row="9" Grid.Column="1" Padding="8 3" IsEnabled="{Binding CenterY, Converter={StaticResource BooleanInverter}}"
+                                            Text="{Binding OffsetY, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" GotFocus="TextBox_GotFocus"
+                                            GotMouseCapture="TextBox_GotMouseCapture" />
+
+                                    <CheckBox Grid.Row="10" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Cursor="Hand"
+                                            IsChecked="{Binding CenterX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MaterialDesignCheckBox}" />
+
+                                    <CheckBox Grid.Row="11" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Cursor="Hand"
+                                            IsChecked="{Binding CenterY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MaterialDesignCheckBox}" />
+
+                                    <!--量測用-->
+                                    <!--<TextBlock Grid.Row="0" Grid.RowSpan="100" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" TextAlignment="Center"
+                                                FontSize="24" Foreground="Blue" Background="{StaticResource ColorPurpleTransparent}"
+                                                Text="{Binding ActualWidth, RelativeSource={RelativeSource Mode=Self}, UpdateSourceTrigger=PropertyChanged}" />-->
+                                    <!--#endregion-->
+
+                                    <!--#region Acquistion Control -->
+                                    <TextBlock Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="2" VerticalAlignment="Center" FontFamily="Consolas" FontSize="16" FontWeight="Bold"
+                                            Style="{StaticResource MaterialDesignSubtitle1TextBlock}" Text="Acquisition Controls" />
+                                    <Separator Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="2" Margin="0 8 0 0" Height="1" />
+
+                                    <TextBlock Grid.Row="2" Grid.Column="3" Text="Trigger Selector" />
+                                    <TextBlock Grid.Row="3" Grid.Column="3" Text="Trigger Mode" />
+                                    <TextBlock Grid.Row="4" Grid.Column="3" Text="Trigger Source" />
+
+                                    <TextBlock Grid.Row="5" Grid.Column="3" Text="Exposure Mode" />
+                                    <TextBlock Grid.Row="6" Grid.Column="3" Text="Exposure Auto" />
+                                    <TextBlock Grid.Row="7" Grid.Column="3" Text="Exposure Time" />
+
+                                    <TextBlock Grid.Row="8" Grid.Column="3" Text="Fix FPS" />
+                                    <TextBlock Grid.Row="9" Grid.Column="3" Text="FPS" />
+                                    <!--//-->
+                                    <ComboBox Grid.Row="2" Grid.Column="4" SelectedItem="{Binding TriggerSelector}" ItemsSource="{Binding TriggerSelectorEnum}" />
+                                    <ComboBox Grid.Row="3" Grid.Column="4" SelectedItem="{Binding TriggerMode}" ItemsSource="{Binding TriggerModeEnum}" />
+                                    <ComboBox Grid.Row="4" Grid.Column="4" SelectedItem="{Binding TriggerSource}" ItemsSource="{Binding TriggerSourceEnum}" />
+
+                                    <ComboBox Grid.Row="5" Grid.Column="4" SelectedItem="{Binding ExposureMode}" ItemsSource="{Binding ExposureModeEnum}" />
+                                    <ComboBox Grid.Row="6" Grid.Column="4" SelectedItem="{Binding ExposureAuto}" ItemsSource="{Binding ExposureAutoEnum}" />
+                                    <TextBox Grid.Row="7" Grid.Column="4" Padding="8 3"
+                                            Text="{Binding ExposureTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus, StringFormat={}{0:F0}}" GotFocus="TextBox_GotFocus"
+                                            GotMouseCapture="TextBox_GotMouseCapture" />
+
+                                    <CheckBox Grid.Row="8" Grid.Column="4" HorizontalAlignment="Left" VerticalAlignment="Center" Cursor="Hand"
+                                            IsChecked="{Binding FixedFPS, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MaterialDesignCheckBox}" />
+                                    <TextBox Grid.Row="9" Grid.Column="4" Padding="8 3" IsEnabled="{Binding FixedFPS}"
+                                            Text="{Binding FPS, Mode=TwoWay, UpdateSourceTrigger=LostFocus, StringFormat={}{0:F3}}" GotFocus="TextBox_GotFocus"
+                                            GotMouseCapture="TextBox_GotMouseCapture" />
+                                    <!--量測用-->
+                                    <!--<TextBlock Grid.Row="0" Grid.RowSpan="100" Grid.Column="3" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" TextAlignment="Center"
+                                                FontSize="24" Foreground="Blue" Background="{StaticResource ColorPurpleTransparent}"
+                                                Text="{Binding ActualWidth, RelativeSource={RelativeSource Mode=Self}, UpdateSourceTrigger=PropertyChanged}" />-->
+                                    <!--#endregion-->
+
+                                    <!--#region Analog Control -->
+                                    <TextBlock Grid.Row="0" Grid.Column="6" Grid.ColumnSpan="2" VerticalAlignment="Center" FontFamily="Consolas" FontSize="16" FontWeight="Bold"
+                                            Style="{StaticResource MaterialDesignSubtitle1TextBlock}" Text="Analog Controls" />
+                                    <Separator Grid.Row="1" Grid.Column="6" Grid.ColumnSpan="2" Margin="0 8 0 0" Height="1" />
+
+                                    <TextBlock Grid.Row="2" Grid.Column="6" Text="Gain Auto" />
+                                    <TextBlock Grid.Row="3" Grid.Column="6" Text="Gain" />
+
+                                    <TextBlock Grid.Row="4" Grid.Column="6" Text="Black Level" />
+
+                                    <TextBlock Grid.Row="5" Grid.Column="6" Text="Gamma Enable" />
+                                    <TextBlock Grid.Row="6" Grid.Column="6" Text="Gamma Selector" />
+                                    <TextBlock Grid.Row="7" Grid.Column="6" Text="Gamma" />
+                                    <!--// Gamma-->
+                                    <!--標記上下限-->
+                                    <ComboBox Grid.Row="2" Grid.Column="7" SelectedItem="{Binding GainAuto}" ItemsSource="{Binding GainAutoEnum}" />
+                                    <TextBox Grid.Row="3" Grid.Column="7" Padding="0 3"
+                                            IsEnabled="{Binding GainAuto, Converter={StaticResource StringEqualConverter}, ConverterParameter=Off}"
+                                            Text="{Binding Gain, Mode=TwoWay, UpdateSourceTrigger=LostFocus, StringFormat={}{0:D}}" GotFocus="TextBox_GotFocus"
+                                            GotMouseCapture="TextBox_GotMouseCapture">
+                                        <materialDesign:HintAssist.HelperTextStyle>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignHelperTextBlock}">
+                                                <Setter Property="HorizontalAlignment" Value="Right" />
+                                            </Style>
+                                        </materialDesign:HintAssist.HelperTextStyle>
+                                    </TextBox>
+
+                                    <!--<Rectangle Grid.Row="4" Grid.Column="7" Fill="Blue" />-->
+                                    <!--標記上下限-->
+                                    <TextBox Grid.Row="4" Grid.Column="7" Padding="0 3"
+                                            Text="{Binding BlackLevel, Mode=TwoWay, UpdateSourceTrigger=LostFocus, StringFormat={}{0:D}}" GotFocus="TextBox_GotFocus"
+                                            GotMouseCapture="TextBox_GotMouseCapture" />
+
+                                    <CheckBox Grid.Row="5" Grid.Column="7" HorizontalAlignment="Left" VerticalAlignment="Center" Cursor="Hand"
+                                            IsChecked="{Binding GammaEnable , Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MaterialDesignCheckBox}" />
+
+                                    <ComboBox Grid.Row="6" Grid.Column="7" SelectedItem="{Binding GammaSelector}" ItemsSource="{Binding GammaSelectorEnum}" />
+
+                                    <TextBox Grid.Row="7" Grid.Column="7" Padding="0 3"
+                                            IsEnabled="{Binding GammaSelector, Converter={StaticResource StringEqualConverter}, ConverterParameter=User}"
+                                            Text="{Binding Gamma, Mode=TwoWay, UpdateSourceTrigger=LostFocus, StringFormat={}{0:f1}}" GotFocus="TextBox_GotFocus"
+                                            GotMouseCapture="TextBox_GotMouseCapture">
+                                        <materialDesign:HintAssist.HelperTextStyle>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignHelperTextBlock}">
+                                                <Setter Property="HorizontalAlignment" Value="Right" />
+                                            </Style>
+                                        </materialDesign:HintAssist.HelperTextStyle>
+                                    </TextBox>
+
+                                    <!--量測用-->
+                                    <!--<TextBlock Grid.Row="0" Grid.RowSpan="100" Grid.Column="6" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" TextAlignment="Center"
+                                            FontSize="24" Foreground="Blue" Background="{StaticResource ColorPurpleTransparent}"
+                                            Text="{Binding ActualWidth, RelativeSource={RelativeSource Mode=Self}, UpdateSourceTrigger=PropertyChanged}" />-->
+                                    <!--#endregion-->
+
+                                    <!--#region Separators -->
+                                    <Separator Grid.Column="2" Grid.RowSpan="100" Margin="12 0" Width="1" Background="{StaticResource ColorBlueGrayTranparent}"
+                                            Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+
+                                    <Separator Grid.Column="5" Grid.RowSpan="100" Margin="12 0" Width="1" Background="{StaticResource ColorBlueGrayTranparent}"
+                                            Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                                    <!--#endregion-->
+                                </Grid>
+                            </StackPanel>
+                        </TabItem>
+                        <!--#endregion-->
+
+                        <!--#region TabItem2 -->
+                        <TabItem Header="{x:Null}" Margin="0 0" Height="0">
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="4 4">
+                                    <!--#region Model Select Action -->
+                                    <ComboBox HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 0" Padding="8 3" MinWidth="135" FontWeight="SemiBold"
+                                            materialDesign:HintAssist.Hint="Model" materialDesign:ComboBoxAssist.ShowSelectedItem="False"
+                                            SelectedItem="{Binding UserSet, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                            ItemsSource="{Binding UserSetEnum, UpdateSourceTrigger=PropertyChanged}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock TextAlignment="Center" Text="{Binding}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                    <!--//-->
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Height="auto" Content="載入" />
+                                        <!--//-->
+                                        <Button Height="auto" Content="儲存" />
+                                    </StackPanel>
+                                    <!--#endregion-->
+                                </StackPanel>
+                                <!--//-->
+                                <Separator Margin="4 4" />
+                                <!--//-->
+                                <Grid HorizontalAlignment="Stretch" Margin="4 4" Height="{Binding ActualHeight, ElementName=CameraGrid, UpdateSourceTrigger=PropertyChanged}">
+                                    <!--#region Resources -->
+                                    <Grid.Resources>
+                                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MaterialDesignBody2TextBlock}">
+                                            <Setter Property="HorizontalAlignment" Value="Left" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Setter Property="Margin" Value="8 8 0 8" />
+                                            <Setter Property="Padding" Value="0 4" />
+                                            <Setter Property="MinWidth" Value="120" />
+                                            <Setter Property="Height" Value="24" />
+                                            <!--<Setter Property="Background" Value="{StaticResource ColorErrorTransparent}" />-->
+                                        </Style>
+                                        <!--//-->
+                                        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
+                                            <Setter Property="HorizontalAlignment" Value="Left" />
+                                            <Setter Property="Margin" Value="0 8" />
+                                            <Setter Property="MinWidth" Value="120" />
+                                            <Setter Property="Height" Value="24" />
+                                            <Setter Property="TextAlignment" Value="Center" />
+                                        </Style>
+                                    </Grid.Resources>
+                                    <!--#endregion-->
+
+                                    <!--#region Layout -->
+                                    <Grid.RowDefinitions>
+                                        <!--0~1-->
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <!--2~4-->
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <!--5~7-->
+                                        <RowDefinition Height="auto" />
+                                        <!--<RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />-->
+                                        <!--8~10-->
+                                        <!--<RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />-->
+                                        <!--11~13-->
+                                        <!--<RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />-->
+                                        <!--last-->
+                                        <RowDefinition Height="1*" />
+                                    </Grid.RowDefinitions>
+                                    <!--//-->
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="auto" />
+                                        <!--//-->
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="auto" />
+                                        <!--separetor-->
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <!--#endregion-->
+
+                                    <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Text="LENS Specification" VerticalAlignment="Center" FontFamily="Consolas" FontSize="16"
+                                            FontWeight="Bold" Style="{StaticResource MaterialDesignSubtitle1TextBlock}" />
+                                    <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 8 0 0" Height="1" />
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Model" />
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Manufacturer" />
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Focal Length" />
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Magnification" />
+                                    <!--<TextBlock Grid.Row="6" Grid.Column="0" Text="Magnification" />-->
+
+                                    <TextBox Grid.Row="2" Grid.Column="1" Padding="8 3" Text="{Binding LensConfig.Model, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                            GotFocus="TextBox_GotFocus" GotMouseCapture="TextBox_GotMouseCapture" />
+                                    <TextBox Grid.Row="3" Grid.Column="1" Padding="8 3" Text="{Binding LensConfig.Manufacturer, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                            GotFocus="TextBox_GotFocus" GotMouseCapture="TextBox_GotMouseCapture" />
+                                    <TextBox Grid.Row="4" Grid.Column="1" Padding="8 3"
+                                            Text="{Binding LensConfig.FocalLength, Mode=TwoWay, StringFormat={}{0:##.##}, UpdateSourceTrigger=LostFocus}"
+                                            materialDesign:TextFieldAssist.SuffixText="mm" GotFocus="TextBox_GotFocus" GotMouseCapture="TextBox_GotMouseCapture" />
+                                    <TextBox Grid.Row="5" Grid.Column="1" Padding="8 3" FontWeight="SemiBold"
+                                            Text="{Binding LensConfig.Magnification, Mode=TwoWay, StringFormat={}{0:0.#####}, UpdateSourceTrigger=LostFocus}"
+                                            materialDesign:TextFieldAssist.SuffixText="x" Foreground="{StaticResource ColorSuccess}" GotFocus="TextBox_GotFocus"
+                                            GotMouseCapture="TextBox_GotMouseCapture" />
+
+                                    <!--<TextBox Grid.Row="6" Grid.Column="1" Padding="8 3" Text="{Binding LensConfig.Model, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                            GotFocus="TextBox_GotFocus" GotMouseCapture="TextBox_GotMouseCapture" />-->
+
+                                    <!--
+                                        <TextBlock Grid.Row="7" Grid.Column="0" Text="{x:Null}" />
+                                        <TextBlock Grid.Row="8" Grid.Column="0" Text="{x:Null}" />
+                                        <TextBlock Grid.Row="9" Grid.Column="0" Text="{x:Null}" />
+                                        <TextBlock Grid.Row="10" Grid.Column="0" Text="{x:Null}" />
+                                        <TextBlock Grid.Row="11" Grid.Column="0" Text="{x:Null}" />
+                                    -->
+
+                                    <!--#region Separators -->
+                                    <Separator Grid.Column="2" Grid.RowSpan="100" Margin="12 0" Width="1" Background="{StaticResource ColorBlueGrayTranparent}"
+                                            Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+
+                                    <Separator Grid.Column="5" Grid.RowSpan="100" Margin="12 0" Width="1" Background="Transparent"
+                                            Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                                    <!--#endregion-->
+                                </Grid>
+                            </StackPanel>
+                        </TabItem>
+                        <!--#endregion-->
+                    </TabControl>
+                    <!--#endregion-->
+                </DockPanel>
+
+                <!--// // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // -->
+                <!--<TextBlock HorizontalAlignment="Left"
+                            Text="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=StackPanel, AncestorLevel=1}, Mode=OneWay}" />
+                    <TextBlock HorizontalAlignment="Left" Margin="0 12 0 0"
+                            Text="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ctrl:CustomCard, AncestorLevel=1}, Mode=OneWay}" />
+                    <TextBlock HorizontalAlignment="Left" Margin="0 24 0 0"
+                            Text="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid, AncestorLevel=1}, Mode=OneWay}" />-->
+                <!--// // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // -->
+            </ctrl:CustomCard>
+            <!--#endregion-->
+        </StackPanel>
+        <!--#endregion-->
+    </Grid>
+</StackPanel>

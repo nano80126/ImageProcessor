@@ -1,0 +1,91 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ctrl="clr-namespace:MCAJawIns.Control" 
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+                    xmlns:cvt="clr-namespace:MCAJawIns.Converter">
+    <ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary.MergedDictionaries>
+
+    <Style TargetType="{x:Type TextBlock}" x:Key="HeaderStyle" BasedOn="{StaticResource MaterialDesignSubtitle1TextBlock}">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+        <Setter Property="FontSize" Value="19.2" />
+        <Setter Property="FontFamily" Value="consolas" />
+    </Style>
+
+    <Style x:Key="MaterialDesignCustomCard" TargetType="{x:Type ctrl:CustomCard}">
+        <Setter Property="Margin" Value="2 0 2 8" />
+        <Setter Property="Padding" Value="4 8 4 4" />
+        <Setter Property="Foreground" Value="Black" />
+        <Setter Property="Background" Value="{DynamicResource ColorLightGrayTransparent}" />
+        <Setter Property="FontFamily" Value="consolas" />
+        <Setter Property="materialDesign:ShadowAssist.ShadowDepth" Value="Depth0" />
+        <!--//-->
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ctrl:CustomCard}">
+                    <!--#region Resources -->
+                    <ControlTemplate.Resources>
+                        <cvt:ObjectNotNullConverter x:Key="ObjectNotNullConverter" />
+                        <cvt:ObjectNotNullToVisibility x:Key="ObjectNotNullToVisibility" />
+                        <cvt:BooleanOrToVisibility x:Key="BooleanOrToVisibility" />
+                        <cvt:BooleanToVisibility x:Key="BooleanToVisibility" />
+                        <cvt:BooleanToVisibility x:Key="BooleanToVisibility2" FalseValue="Hidden" />
+                    </ControlTemplate.Resources>
+                    <!--#endregion-->
+
+                    <materialDesign:Card Padding="{TemplateBinding Padding}" FontFamily="{TemplateBinding FontFamily}"
+                            materialDesign:ShadowAssist.ShadowDepth="{TemplateBinding materialDesign:ShadowAssist.ShadowDepth}" Foreground="{TemplateBinding Foreground}"
+                            Background="{TemplateBinding Background}" UniformCornerRadius="{TemplateBinding UniformCornerRadius}">
+                        <DockPanel Background="Transparent" x:Name="Panel">
+                            <DockPanel x:Name="Header" DockPanel.Dock="Top" Margin="4 0" Focusable="True"
+                                    Visibility="{TemplateBinding ShowHeader, Converter={StaticResource BooleanToVisibility}}">
+                                <!--<materialDesign:PackIcon Kind="{Binding IconKind, RelativeSource={RelativeSource Mode=TemplatedParent}, UpdateSourceTrigger=PropertyChanged}" Width="30" Height="26"/>-->
+                                <materialDesign:PackIcon DockPanel.Dock="Left" Width="30" Height="26" Kind="{TemplateBinding IconKind}"
+                                        Visibility="{TemplateBinding ShowIcon, Converter={StaticResource BooleanToVisibility2}}" />
+                                <TextBlock DockPanel.Dock="Left" Text="{TemplateBinding Title}" Style="{StaticResource HeaderStyle}" />
+
+                                <TextBlock DockPanel.Dock="Right" FontSize="16" Foreground="{StaticResource ColorSecondary}" Text="{TemplateBinding SubTitle}"
+                                        Style="{StaticResource HeaderStyle}" />
+                                <TextBlock Text="{x:Null}" />
+                            </DockPanel>
+                            <!--//-->
+                            <Separator DockPanel.Dock="Top" Margin="4 8 4 4" Visibility="{TemplateBinding ShowHeader, Converter={StaticResource BooleanToVisibility}}" />
+                            <!--//-->
+                            <AdornerDecorator DockPanel.Dock="Top">
+                                <ContentPresenter Margin="{TemplateBinding BodyPadding}" UseLayoutRounding="True" Content="{TemplateBinding Content}"
+                                        ContentTemplate="{TemplateBinding ContentTemplate}" ContentStringFormat="{TemplateBinding ContentStringFormat}" />
+                            </AdornerDecorator>
+                            <!--<ContentPresenter DockPanel.Dock="Top" x:Name="MainContent2" Content="{Binding Path=Content}"/>-->
+                            <!--//-->
+                            <!--<Separator DockPanel.Dock="Top" Margin="0 8" Visibility="{Binding Footer, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource ObjectNotNullToVisibility}}"/>-->
+                            <Separator DockPanel.Dock="Top" Margin="4 4">
+                                <!--Visibility="{TemplateBinding Footer, Converter={StaticResource ObjectNotNullToVisibility}}"-->
+                                <Separator.Visibility>
+                                    <MultiBinding Converter="{StaticResource BooleanOrToVisibility}">
+                                        <Binding RelativeSource="{RelativeSource Mode=TemplatedParent}" Path="Footer" Converter="{StaticResource ObjectNotNullConverter}" />
+                                        <Binding RelativeSource="{RelativeSource Mode=TemplatedParent}" Path="FooterTemplate" Converter="{StaticResource ObjectNotNullConverter}" />
+                                    </MultiBinding>
+                                </Separator.Visibility>
+                            </Separator>
+
+                            <!--Visibility="{Binding Footer, Converter={StaticResource ObjectNotNullToVisibility}}"-->
+                            <!--//-->
+                            <AdornerDecorator DockPanel.Dock="Bottom">
+                                <!--<ContentPresenter Content="{Binding Footer, RelativeSource={RelativeSource Mode=TemplatedParent}, UpdateSourceTrigger=PropertyChanged}"/>-->
+                                <ContentPresenter Content="{TemplateBinding Footer}" ContentTemplate="{TemplateBinding FooterTemplate}" />
+                            </AdornerDecorator>
+                        </DockPanel>
+                    </materialDesign:Card>
+
+                    <ControlTemplate.Triggers />
+                    <!--
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="Red"/>
+                        </Trigger>
+                    -->
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

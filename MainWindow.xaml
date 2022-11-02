@@ -113,7 +113,7 @@
         <CommandBinding Command="{StaticResource AssistPointsOn}" CanExecute="EngineerTabCanExcute" Executed="AssistPointsOnCommand" />
         <!--Switch Tab-->
         <CommandBinding Command="{StaticResource SwitchTab}" CanExecute="CanExcute" Executed="SwitchTabCommand" />
-        <CommandBinding Command="{StaticResource SwitchJawTab}" CanExecute="MainTabCanExcute" Executed="SwitchJawTabCommand" />
+        <!--<CommandBinding Command="{StaticResource SwitchJawTab}" CanExecute="MainTabCanExcute" Executed="SwitchJawTabCommand" />-->
         <!--Config-->
 
         <!--Global-->

@@ -1,0 +1,155 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>niti.ico</ApplicationIcon>
+    <AssemblyName>MCAJawIns</AssemblyName>
+    <RootNamespace>MCAJawIns</RootNamespace>
+    <Configurations>Debug;Release;Debug Jaw S</Configurations>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;NOPROCESS;debug;JawM;</DefineConstants>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Jaw S|AnyCPU'">
+    <DefineConstants>TRACE;debug;JawS;</DefineConstants>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE;NOPROCESS0;JawS;</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="algorithm\**" />
+    <Compile Remove="tabs\Main\**" />
+    <Compile Remove="module\**" />
+    <Compile Remove="tabs\MCAJaw\**" />
+    <EmbeddedResource Remove="algorithm\**" />
+    <EmbeddedResource Remove="tabs\Main\**" />
+    <EmbeddedResource Remove="module\**" />
+    <EmbeddedResource Remove="tabs\MCAJaw\**" />
+    <None Remove="algorithm\**" />
+    <None Remove="tabs\Main\**" />
+    <None Remove="module\**" />
+    <None Remove="tabs\MCAJaw\**" />
+    <Page Remove="algorithm\**" />
+    <Page Remove="tabs\Main\**" />
+    <Page Remove="module\**" />
+    <Page Remove="tabs\MCAJaw\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="camera\BaslerEvent.cs" />
+    <Compile Remove="class\INotyfyCollectionChanged.cs" />
+    <Compile Remove="class\product\MCA Jaw\JawSizeSpecList.cs" />
+    <Compile Remove="class\ShihlinSDE.cs" />
+    <Compile Remove="MCAJaw.cs" />
+    <Compile Remove="MCAJawL.cs" />
+    <Compile Remove="MCAJawM.cs" />
+    <Compile Remove="MCAJawS.cs" />
+    <Compile Remove="tabs\CameraTab.xaml.cs" />
+    <Compile Remove="tabs\DatabaseTab.xaml.cs" />
+    <Compile Remove="tabs\MainTab.xaml.cs" />
+    <Compile Remove="tabs\MCAJaw.xaml.cs" />
+    <Compile Remove="tabs\ModbusMotorTab.xaml.cs" />
+    <Compile Remove="tabs\MotionTab.xaml.cs" />
+    <Compile Remove="IOWindow.xaml.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="dll\AdvMotAPI.dll" />
+    <None Remove="dll\Automation.BDaq4.dll" />
+    <None Remove="dll\Basler.Pylon.dll" />
+    <None Remove="dll\Basler.Pylon.xml" />
+    <None Remove="dll\netDxf.dll" />
+    <None Remove="dll\netDxf.xml" />
+    <None Remove="intai.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Remove="tabs\CameraTab.xaml" />
+    <Page Remove="tabs\DatabaseTab.xaml" />
+    <Page Remove="tabs\MainTab.xaml" />
+    <Page Remove="tabs\MCAJaw.xaml" />
+    <Page Remove="tabs\ModbusMotorTab.xaml" />
+    <Page Remove="tabs\MotionTab.xaml" />
+    <Page Remove="IOWindow.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <COMReference Include="WMPLib">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>6bf52a50-394a-11d3-b153-00c04f79faa6</Guid>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="dll\AdvMotAPI.dll" />
+    <Content Include="dll\Automation.BDaq4.dll" />
+    <Content Include="dll\Basler.Pylon.dll" />
+    <Content Include="dll\Basler.Pylon.xml" />
+    <Content Include="dll\netDxf.dll" />
+    <Content Include="dll\netDxf.xml" />
+    <Content Include="intai.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MaterialDesignColors" Version="2.0.4" />
+    <PackageReference Include="MaterialDesignThemes" Version="4.3.0" />
+    <PackageReference Include="MongoDB.Bson" Version="2.17.1" />
+    <PackageReference Include="MongoDB.Driver" Version="2.17.1" />
+    <PackageReference Include="MongoDB.Driver.Core" Version="2.17.1" />
+    <PackageReference Include="OpenCvSharp4" Version="4.5.3.20211207" />
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.5.3.20211207" />
+    <PackageReference Include="System.IO.Ports" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SystemInfo\SystemInfo.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="AdvMotAPI">
+      <HintPath>dll\AdvMotAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="Automation.BDaq4">
+      <HintPath>..\..\Apex 外觀檢測 AOI\Code Examples\PCI-1730U Examples\Automation.BDaq\4.0.0.0\Automation.BDaq4.dll</HintPath>
+    </Reference>
+    <Reference Include="Basler.Pylon">
+      <HintPath>dll\Basler.Pylon.dll</HintPath>
+    </Reference>
+    <Reference Include="netDxf">
+      <HintPath>C:\Users\nano80126\.nuget\packages\netdxf\2.2.0.1\lib\net45\netDxf.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="sound\Alarm.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="sound\NG.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

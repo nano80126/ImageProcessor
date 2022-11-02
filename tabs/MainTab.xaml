@@ -1,0 +1,717 @@
+﻿<StackPanel x:Class="ApexVisIns.content.MainTab"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:app="clr-namespace:ApexVisIns"
+            xmlns:ctProperty="clr-namespace:ApexVisIns.CustomProperty"
+            xmlns:pd="clr-namespace:ApexVisIns.Product"
+            xmlns:control="clr-namespace:ApexVisIns.Control" 
+            d:DataContext="{d:DesignInstance Type=pd:ApexDefect}"
+            DataContext="{StaticResource ApexDefect}"
+            mc:Ignorable="d" 
+            Loaded="StackPanel_Loaded"
+            Unloaded="StackPanel_Unloaded"
+            d:DesignHeight="900" d:DesignWidth="1600"
+            UseLayoutRounding="True"
+            Orientation="Vertical">
+    <StackPanel.Resources>
+        <pd:ApexStatusToColorConverter x:Key="StatusColorConverter"/>
+    </StackPanel.Resources>
+    
+    <DockPanel x:Name="ToolBarPanel" HorizontalAlignment="Stretch" Background="#22969696">
+        <!--#region ToolBar 1 -->
+        <ToolBarTray DockPanel.Dock="Left"  VerticalAlignment="Center" HorizontalAlignment="Stretch" ClipToBounds="True" UseLayoutRounding="True" Background="{x:Null}" Margin="0">
+            <ToolBar Style="{StaticResource MaterialDesignToolBar}" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{x:Null}" Height="38" ToolBarTray.IsLocked="True" Focusable="False">
+                <ToolBar.Resources>
+                    <!--<Style></Style>-->
+                </ToolBar.Resources>
+
+                <!--<Canvas VerticalAlignment="Center" Style="{StaticResource ComplexPackIcon}" Background="White">
+                        <materialDesign:PackIcon Kind="VideoOutline" Width="26" Height="24" />
+                        <materialDesign:PackIcon Kind="Check" Canvas.Right="0" Canvas.Bottom="0" />
+                    </Canvas>-->
+
+                <!--<TextBlock VerticalAlignment="Center" FontSize="16" FontWeight="Bold" Foreground="{StaticResource  ColorPrimary}" Text="規格選擇 (長、中、短)"/>-->
+
+                <!--<TextBlock Text="規格選擇" VerticalAlignment="Center" FontSize="16" FontWeight="Bold" Foreground="{StaticResource  ColorPrimary}"/>-->
+                <Button Margin="12 0 0 0" VerticalAlignment="Center" Content="原點復歸" Foreground="{StaticResource ColorSuccess}" Style="{StaticResource MaterialDesignToolButton}" 
+                        IsEnabled="{Binding HardwarePrepared, Source={StaticResource ApexDefect}, UpdateSourceTrigger=PropertyChanged}"
+                        Click="ZeroReturnButton_Click"/>
+
+                <ListBox Margin="12 0 0 0" Style="{StaticResource MaterialDesignToolToggleListBox}" Background="Transparent" Foreground="{StaticResource ColorPurple}"
+                         materialDesign:ListBoxItemAssist.ShowSelection="True" materialDesign:ShadowAssist.ShadowDepth="Depth0"
+                         materialDesign:ListBoxAssist.IsToggle="False"  Cursor="Hand" SelectionChanged="SpecSelector_SelectionChanged">
+                    <ListBox.IsEnabled>
+                        <MultiBinding Converter="{StaticResource BooleanAndGate}">
+                            <Binding Source="{StaticResource ServoMotion}" Path="Axes[0].IsAxisOpen" FallbackValue="false"/>
+                            <Binding Source="{StaticResource ServoMotion}" Path="Axes[0].ZeroReturned" FallbackValue="false"/>
+                            <Binding Source="{StaticResource ApexDefect}" Path="CurrentStep" 
+                                     Converter="{StaticResource NumberEqualConverter}" ConverterParameter="2"/>
+                        </MultiBinding>
+                        <!--1. 確認 Servo Motion 連線狀態-->
+                        <!--2. 確認 是否有原點復歸-->
+                    </ListBox.IsEnabled>
+
+                    <ListBoxItem Content="短" FontSize="16" Padding="25 0" Height="32" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                    <ListBoxItem Content="中" FontSize="16" Padding="25 0" Height="32" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                    <ListBoxItem Content="長" FontSize="16" Padding="25 0" Height="32" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                </ListBox>
+                <!--//-->
+                <Separator />
+                <!--//-->
+
+                <!--#region 測試用 -->
+                <Button Margin="12 0 0 0" VerticalAlignment="Center" Click="ToggleCameraGrabbing_Click">
+                    <!-- Style="{StaticResource MaterialDesignToolButton}" -->
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignToolButton}">
+                            <Style.Triggers>
+                                <DataTrigger Value="True">
+                                    <DataTrigger.Binding>
+                                        <MultiBinding Converter="{StaticResource BooleanAndGate}">
+                                            <Binding Path="[0].IsGrabbing" Source="{StaticResource BaslerCams}" FallbackValue="False"/>
+                                            <Binding Path="[1].IsGrabbing" Source="{StaticResource BaslerCams}" FallbackValue="False"/>
+                                            <Binding Path="[2].IsGrabbing" Source="{StaticResource BaslerCams}" FallbackValue="False"/>
+                                            <Binding Path="[3].IsGrabbing" Source="{StaticResource BaslerCams}" FallbackValue="False"/>
+                                        </MultiBinding>
+                                    </DataTrigger.Binding>
+                                    <Setter Property="Content" Value="關閉拍攝"/>
+                                    <Setter Property="Foreground" Value="{StaticResource ColorWarning}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                            <Setter Property="Content" Value="啟動拍攝"/>
+                            <Setter Property="Foreground" Value="{StaticResource ColorSuccess}"/>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <Button Margin="12 0 0 0" VerticalAlignment="Center" Content="啟動Grabber" Foreground="{StaticResource ColorSuccess}"
+                        Style="{StaticResource MaterialDesignToolButton}" Click="StartCameraGrabber_Click"/>
+
+                <Button Margin="12 0 0 0" VerticalAlignment="Center" Content="停止Grabber" Foreground="{StaticResource ColorOrange}"
+                        Style="{StaticResource MaterialDesignToolButton}" Click="StopCameraGrabber_Click"/>
+
+                <Button Margin="12 0 0 0" VerticalAlignment="Center" Content="擷取影像" Foreground="{StaticResource ColorPurple}"
+                        Style="{StaticResource MaterialDesignToolButton}" Click="RetrieveImage_Click"/>
+
+                <Button Margin="12 0 0 0" VerticalAlignment="Center" Content="裝置斷線" Foreground="{StaticResource ColorError}"
+                        Style="{StaticResource MaterialDesignToolButton}" Click="DeinitBtn_Click"/>
+                <!-- #endregion -->
+
+                <!--測試用-->
+                <!--<Button Margin="250 0 0 0" VerticalAlignment="Center" Content="確認 (測試用)" 
+                Style="{StaticResource MaterialDesignToolButton}" Click="CheckHwStatus_Click"/>-->
+
+                <!--#region 測試用 -->
+                <Button Margin="12 0 0 0" VerticalAlignment="Center" Content="角度校正" Foreground="{StaticResource ColorSuccess}"
+                        Style="{StaticResource MaterialDesignToolButton}" Click="AngleCorrectionButton_Click">
+                    <Button.ToolTip>
+                        <TextBlock Text="啟動角度校正"/>
+                    </Button.ToolTip>
+                </Button>
+
+                <Button Margin="12 0 0 0" VerticalAlignment="Center" Content="停止相機" Foreground="{StaticResource ColorSuccess}"
+                        Style="{StaticResource MaterialDesignToolButton}" Click="StopCamera_Click">
+                    <Button.ToolTip>
+                        <TextBlock Text="停止相機連續拍攝，角度校正失敗時可用來關閉相機"/>
+                    </Button.ToolTip>
+                </Button>
+
+                <Button Margin="12 0 0 0" VerticalAlignment="Center" Content="順序檢測" Foreground="{StaticResource ColorIndigo}"
+                        Style="{StaticResource MaterialDesignToolButton}" Click="SequenceInspection_Click">
+                    <Button.ToolTip>
+                        <TextBlock Text="開始窗戶、耳朵瑕疵檢測"/>
+                    </Button.ToolTip>
+                </Button>
+
+
+                <Button Margin="12 0 0 0" VerticalAlignment="Center" Content="表面檢測" Foreground="{StaticResource ColorTeal}"
+                        Style="{StaticResource MaterialDesignToolButton}" Click="StartSurfaceIns_Click">
+                    <Button.ToolTip>
+                        <TextBlock Text="開始管件表面檢測"/>
+                    </Button.ToolTip>
+                </Button>
+                <!--#endregion-->
+            </ToolBar>
+        </ToolBarTray>
+        <!--#endregion-->
+
+        <!--#region Toolbar 2 -->
+        <ToolBarTray DockPanel.Dock="Right" FlowDirection="RightToLeft" VerticalAlignment="Center" HorizontalAlignment="Right" ClipToBounds="True" UseLayoutRounding="True" Background="{x:Null}" Margin="0">
+            <ToolBar Style="{StaticResource MaterialDesignToolBar}" HorizontalAlignment="Right" VerticalAlignment="Center" Background="{x:Null}" Height="38" ToolBarTray.IsLocked="True" Focusable="False">
+                <ToolBar.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="BorderBrush" Value="DarkBlue"/>
+                        <Setter Property="BorderThickness" Value="1"/>
+                        <Setter Property="CornerRadius" Value="2"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="Padding" Value="0 2"/>
+                    </Style>
+
+                    <Style TargetType="Canvas" BasedOn="{StaticResource ComplexPackIcon}">
+                        <Setter Property="FlowDirection" Value="LeftToRight"/>
+                        <Setter Property="Margin" Value="8 0"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                    </Style>
+
+                    <Style TargetType="materialDesign:PackIcon" x:Key="HWStatus">
+                        <Setter Property="Width" Value="16"/>
+                        <Setter Property="Height" Value="16"/>
+                        <Setter Property="Canvas.Right" Value="0"/>
+                        <Setter Property="Canvas.Bottom" Value="0"/>
+
+                        <Setter Property="Kind" Value="CloseCircle"/>
+                        <Setter Property="Foreground" Value="{StaticResource ColorError}"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding (ctProperty:StatusHelper.Connected), RelativeSource={RelativeSource Mode=Self}}" Value="True">
+                                <Setter Property="Kind" Value="CheckCircle"/>
+                                <Setter Property="Foreground" Value="{StaticResource ColorSuccess}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+
+                    <Style TargetType="materialDesign:PackIcon" x:Key="CamStatus" BasedOn="{StaticResource HWStatus}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding (ctProperty:StatusHelper.IsGrabbing), RelativeSource={RelativeSource Mode=Self}}" Value="True">
+                                <Setter Property="Kind" Value="CameraImage"/>
+                                <Setter Property="Foreground" Value="{StaticResource ColorTeal}"/>
+                            </DataTrigger>
+                        </Style.Triggers>    
+                    </Style>
+
+                    <Style TargetType="materialDesign:PackIcon" x:Key="MotionStatus" BasedOn="{StaticResource HWStatus}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding (ctProperty:StatusHelper.Alarm), RelativeSource={RelativeSource Mode=Self}}" Value="True">
+                                <Setter Property="Kind" Value="AlertCircle"/>
+                                <Setter Property="Foreground" Value="{StaticResource ColorOrange}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ToolBar.Resources>
+
+                <!--#region Light Contorller Connection Status Bar -->
+                <Border Margin="0 0 12 0" FlowDirection="LeftToRight">
+                    <StackPanel Orientation="Horizontal">
+                        <!--// 24V Light Controller -->
+                        <Canvas ToolTip="24V 光源控制器">
+                            <materialDesign:PackIcon Kind="LightbulbOnOutline" Canvas.Left="2" Canvas.Top="1" Width="26" Height="24"/>
+                            <materialDesign:PackIcon Style="{StaticResource HWStatus}" 
+                                                     ctProperty:StatusHelper.Connected="{Binding [0].IsComOpen, Source={StaticResource LightCtrls}, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Canvas>
+                        <!--// 6V Light Controller -->
+                        <Canvas ToolTip="6V 光源控制器">
+                            <materialDesign:PackIcon Kind="LightbulbOnOutline" Canvas.Left="2" Canvas.Top="1" Width="26" Height="24"/>
+                            <materialDesign:PackIcon Style="{StaticResource HWStatus}" 
+                                                     ctProperty:StatusHelper.Connected="{Binding [1].IsComOpen, Source={StaticResource LightCtrls}, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Canvas>
+                    </StackPanel>
+                </Border>
+                <!--#endregion-->
+
+                <!--#region Motor Controller Connection Status -->
+                <Border Margin="0 0 12 0" FlowDirection="LeftToRight">
+                    <StackPanel Orientation="Horizontal">
+                        <!-- X 軸驅動 -->
+                        <Canvas ToolTip="X 軸驅動器" Background="Transparent">
+                            <materialDesign:PackIcon Kind="AxisXRotateClockwise" Canvas.Left="2" Canvas.Top="1" Width="26" Height="24"/>
+                            <materialDesign:PackIcon Style="{StaticResource MotionStatus}"
+                                                     ctProperty:StatusHelper.Connected="{Binding Axes[0].IsAxisOpen, Source={StaticResource ServoMotion}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=False}"
+                                                     ctProperty:StatusHelper.Alarm="{Binding Axes[0].IO_ALM.BitOn, Source={StaticResource ServoMotion}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=False}"/>
+                        </Canvas>
+                        <!-- A 軸驅動 -->
+                        <Canvas ToolTip="A 軸驅動器" Background="Transparent">
+                            <materialDesign:PackIcon Kind="RotateLeft" Canvas.Left="2" Canvas.Top="1" Width="26" Height="24"/>
+                            <materialDesign:PackIcon Style="{StaticResource MotionStatus}" 
+                                                     ctProperty:StatusHelper.Connected="{Binding Axes[1].IsAxisOpen, Source={StaticResource ServoMotion}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=False}"
+                                                     ctProperty:StatusHelper.Alarm="{Binding Axes[1].IO_ALM.BitOn, Source={StaticResource ServoMotion}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=False}"/>
+                        </Canvas>
+                        <!--//-->
+                    </StackPanel>
+                </Border>
+                <!--#endregion-->
+
+                <!--#region Camera Connection Status Bar -->
+                <Border FlowDirection="LeftToRight">
+                    <StackPanel Orientation="Horizontal">
+                        <Canvas ToolTip="Camera 1">
+                            <materialDesign:PackIcon Kind="VideoOutline" Canvas.Left="2" Canvas.Top="1" Width="26" Height="24"/>
+                            <materialDesign:PackIcon Style="{StaticResource CamStatus}"
+                                                     ctProperty:StatusHelper.Connected="{Binding [0].IsOpen, Source={StaticResource BaslerCams}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=False}"
+                                                     ctProperty:StatusHelper.IsGrabbing="{Binding [0].IsGrabbing, Source={StaticResource BaslerCams}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=False}"/>
+                        </Canvas>
+
+                        <Canvas ToolTip="Camera 2">
+                            <materialDesign:PackIcon Kind="VideoOutline" Canvas.Left="2" Canvas.Top="1" Width="26" Height="24"/>
+                            <materialDesign:PackIcon Style="{StaticResource CamStatus}"
+                                                     ctProperty:StatusHelper.Connected="{Binding [1].IsOpen, Source={StaticResource BaslerCams}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=False}"
+                                                     ctProperty:StatusHelper.IsGrabbing="{Binding [1].IsGrabbing, Source={StaticResource BaslerCams}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=False}"/>
+                        </Canvas>
+
+                        <Canvas ToolTip="Camera 3">
+                            <materialDesign:PackIcon Kind="VideoOutline" Canvas.Left="2" Canvas.Top="1" Width="26" Height="24"/>
+                            <materialDesign:PackIcon Style="{StaticResource CamStatus}"
+                                                     ctProperty:StatusHelper.Connected="{Binding [2].IsOpen, Source={StaticResource BaslerCams}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=False}"
+                                                     ctProperty:StatusHelper.IsGrabbing="{Binding [2].IsGrabbing, Source={StaticResource BaslerCams}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=False}"/>
+                        </Canvas>
+
+                        <Canvas ToolTip="Camera 4">
+                            <materialDesign:PackIcon Kind="VideoOutline" Canvas.Left="2" Canvas.Top="1" Width="26" Height="24"/>
+                            <materialDesign:PackIcon Style="{StaticResource CamStatus}"
+                                                     ctProperty:StatusHelper.Connected="{Binding [3].IsOpen, Source={StaticResource BaslerCams}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=False}"
+                                                     ctProperty:StatusHelper.IsGrabbing="{Binding [3].IsGrabbing, Source={StaticResource BaslerCams}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=False}"/>
+                        </Canvas>
+                    </StackPanel>
+                </Border>
+                <!--#endregion-->
+            </ToolBar>
+        </ToolBarTray>
+        <!--#endregion-->
+    </DockPanel>
+
+    <Border x:Name="ContentBorder" BorderBrush="{StaticResource ColorGray}" BorderThickness="0 1" Background="AliceBlue">
+        <!--<StackPanel x:Name="Content" Orientation="Vertical" HorizontalAlignment="Stretch" Margin="1 0" UseLayoutRounding="True">-->
+        <Grid x:Name="Content" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0 0" UseLayoutRounding="True">
+            <Grid.Style>
+                <Style TargetType="{x:Type Grid}">
+                    <Setter Property="Height" Value="780"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}, Mode=OneWay}" Value="Maximized">
+                            <Setter Property="Height" Value="960"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <!--//-->
+            <Grid.ColumnDefinitions>
+                <!--// 34 -->
+                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="4*"/>
+            </Grid.ColumnDefinitions>
+            <!--//-->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="4*"/>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="2*"/>
+                <!--<RowDefinition Height="3*"/>-->
+                <RowDefinition Height="2*"/>
+            </Grid.RowDefinitions>
+            <!--#region Control Panel-->
+            <Border Grid.Row="0" Grid.Column="0" Background="{x:Null}">
+                <materialDesign:Card Style="{StaticResource GeneralCard}">
+                    <DockPanel Background="Transparent">
+                        <!-- Panel Header -->
+                        <DockPanel x:Name="Header" DockPanel.Dock="Top">
+                            <materialDesign:PackIcon Kind="ControllerClassic" Width="30" Height="26" Background="Transparent" VerticalAlignment="Bottom"/>
+                            <!--  -->
+                            <TextBlock FontWeight="Bold" VerticalAlignment="Bottom" FontSize="18" Text="控制板" Style="{StaticResource MaterialDesignSubtitle1TextBlock}"/>
+                            <!--  -->
+                            <TextBlock Text="{x:Null}"/>
+                        </DockPanel>
+                        <!-- Seperator -->
+                        <Separator DockPanel.Dock="Top" Margin="0 8"/>
+                        <!-- Panel Body -->
+                        <Grid x:Name="Body" DockPanel.Dock="Top" >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1*"/>
+                                <RowDefinition Height="1*"/>
+                                <RowDefinition Height="1*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Control Panel, 1st col, 1st row, 檢驗狀態 -->
+                            <Border x:Name="TestStatusBorder" Grid.Row="0" Grid.Column="0" BorderBrush="Black" BorderThickness="1" CornerRadius="10">
+                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="28"
+                                           FontWeight="SemiBold" TextAlignment="Center" Text="{Binding Status, Converter={StaticResource EnumDescriptionConverter}}"
+                                           Foreground="{Binding Status, Converter={StaticResource StatusColorConverter}}">
+                                    <!--<TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                            <Setter Property="Text" Value="檢測狀態"/>
+                                            <Setter Property="TextAlignment" Value="Center"/>
+                                        </Style>
+                                    </TextBlock.Style>-->
+                                </TextBlock>
+                            </Border>
+
+                            <!-- Control Panel 1st col, 2nd row, 開始 / 停止 -->
+                            <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <Button Content="開始檢測" Margin="12 0" HorizontalAlignment="Center" materialDesign:ButtonAssist.CornerRadius="15"
+                                        Foreground="{StaticResource ColorSuccess}" BorderBrush="{StaticResource ColorSuccess}"  FontSize="16"
+                                        Style="{StaticResource MaterialDesignOutlinedButton}" Click="StartInspect_Click"/>
+                                <Button Content="停止檢測" Margin="12 0" HorizontalAlignment="Center" materialDesign:ButtonAssist.CornerRadius="15"
+                                        Foreground="{StaticResource ColorInfo}" BorderBrush="{StaticResource ColorInfo}" FontSize="16"
+                                        Style="{StaticResource MaterialDesignOutlinedButton}" Click="StopInspect_Click"/>
+                            </StackPanel>
+
+                            <!-- Control Panel 1st col, 3rd row, 經過時間 -->
+                            <TextBlock Grid.Row="2" Grid.Column="0" FontFamily="Consolas" LineHeight="32" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       TextAlignment="Center" FontSize="20" FontWeight="Bold">
+                                <TextBlock.Text>
+                                    <Binding Path="PassedTime" StringFormat="{}經過時間&#x000A;{0}"/>
+                                </TextBlock.Text>
+                                <!--TextAlignment="Center" FontSize="20" FontWeight="Bold" Text="經過時間&#x000A;12:00:00">-->
+                            </TextBlock>
+
+                            <!--<StackPanel Grid.Row="2" Grid.Column="0"></StackPanel>-->
+
+                            <!-- Row 0, Col 1, 檢驗數量 -->
+                            <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" FontFamily="Consolas" LineHeight="32"
+                                       FontSize="20" FontWeight="Bold" Style="{StaticResource MaterialDesignSubtitle1TextBlock}" TextAlignment="Center">
+                                <TextBlock.Text>
+                                    <Binding Path="TotalCount" StringFormat="{}檢驗數量&#x000A;{0}" UpdateSourceTrigger="PropertyChanged"/>
+                                </TextBlock.Text>
+                            </TextBlock>
+
+                            <!--
+                                <StackPanel Grid.Column="1" Grid.Row="0">
+                                    <TextBlock VerticalAlignment="Top" HorizontalAlignment="Center" FontFamily="Consolas" LineHeight="32"
+                                               FontSize="20" FontWeight="Bold"
+                                               Style="{StaticResource MaterialDesignSubtitle1TextBlock}" TextAlignment="Center">
+                                        <Run>檢驗數量: 0</Run>
+                                    </TextBlock>    
+                                </StackPanel>
+                            -->
+                            
+                            <!-- Row 1, Col 1, OK / NG 數量 -->
+                            <DockPanel Grid.Column= "1" Grid.Row="2" HorizontalAlignment="Stretch">
+                                <TextBlock DockPanel.Dock="Left" Margin="16 0 0 0" VerticalAlignment="Center" HorizontalAlignment="Left" 
+                                           FontSize="20" FontWeight="Bold"
+                                           FontFamily="Consolas" LineHeight="32" Foreground="Green"
+                                           Style="{StaticResource MaterialDesignSubtitle1TextBlock}" TextAlignment="Center">
+                                    <TextBlock.Text>
+                                        <Binding Path="OK" StringFormat="{}OK 數量&#x000A;{0}"/>
+                                    </TextBlock.Text>
+                                    <!--<Run Text="OK 數量"/>
+                                        <LineBreak/>
+                                        <Run Text="{Binding OK, UpdateSourceTrigger=PropertyChanged}"/>
+                                    -->
+                                </TextBlock>
+
+                                <TextBlock DockPanel.Dock="Left" Margin="0 0 16 0" VerticalAlignment="Center" HorizontalAlignment="Right" 
+                                           FontSize="20" FontWeight="Bold"
+                                           FontFamily="Consolas" LineHeight="32" Foreground="Red"
+                                           Style="{StaticResource MaterialDesignSubtitle1TextBlock}" TextAlignment="Center">
+                                    <TextBlock.Text>
+                                        <Binding Path="NG" StringFormat="{}NG 數量&#x000A;{0}"/>
+                                    </TextBlock.Text>
+                                    <!--<Run Text="NG 數量"/>
+                                        <LineBreak/>
+                                        <Run Text="10000"/>-->
+                                </TextBlock>
+
+                                <!--
+                                    <TextBlock DockPanel.Dock="Right" Margin="0 0 16 0" VerticalAlignment="Center" HorizontalAlignment="Right" 
+                                               FontSize="20" FontWeight="Bold" 
+                                               FontFamily="Consolas" LineHeight="32" Foreground="{StaticResource ColorSecondary}"
+                                               Style="{StaticResource MaterialDesignSubtitle1TextBlock}" TextAlignment="Center">
+                                        <Run Text="OK" Foreground="{StaticResource ColorSuccess}"/>
+                                        <Run Text="/"/>
+                                        <Run Text="NG" Foreground="{StaticResource ColorError}"/>
+                                        <LineBreak/>
+                                        <Run Text="200000" Foreground="{StaticResource ColorSuccess}"/>
+                                        <Run Text="/"/>
+                                        <Run Text="10" Foreground="{StaticResource ColorError}"/>
+                                    </TextBlock>
+                                -->
+                            </DockPanel>
+                        </Grid>
+                    </DockPanel>
+                    <!--//-->
+                </materialDesign:Card>
+            </Border>
+            <!--#endregion-->
+
+            <!--#region Images -->
+            <!-- Image 1 -->
+            <Border Grid.Row="0" Grid.Column="1" x:Name="Image1Border" BorderThickness="1 0 0 0" BorderBrush="{StaticResource ColorGrayTransparent}">
+                <Viewbox x:Name="Image1Viewbox">
+                    <Image x:Name="Image1" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Source="{Binding ImageSource1, RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor},UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />
+                </Viewbox>
+            </Border>
+
+            <!-- Image 2 -->
+            <Border Grid.Row="0" Grid.Column="2" x:Name="Image2Border" BorderThickness="1 0 0 0" BorderBrush="{StaticResource ColorGrayTransparent}">
+                <Viewbox x:Name="Image2Viewbox">
+                    <Image x:Name="Image2" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Source="{Binding ImageSource2, RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+                </Viewbox>
+                <!--
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"
+                               Style="{StaticResource MaterialDesignHeadline4TextBlock}">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="Camera 2&#x0d;&#x0a;{0} x {1}">
+                                <Binding ElementName="Image2Border" Path="ActualWidth" Mode="OneWay"/>
+                                <Binding ElementName="Image2Border" Path="ActualHeight" Mode="OneWay"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                -->
+            </Border>
+
+            <!-- Image 3 -->
+            <Border Grid.Row="1" Grid.ColumnSpan="3" x:Name="Image3Border" BorderThickness="0 1 0 0" BorderBrush="{StaticResource ColorGrayTransparent}">
+                <!-- Grid 待移除 -->
+                <!--<Grid>-->
+                    <Viewbox x:Name="Image3Viewbox">
+                        <Image x:Name="Image3" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Source="{Binding ImageSource3, RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+                    </Viewbox>
+
+                    <!--<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"
+                           Style="{StaticResource MaterialDesignHeadline4TextBlock}">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="Camera 3&#x0d;&#x0a;{0} x {1}">
+                                <Binding ElementName="Image3Border" Path="ActualWidth" Mode="OneWay"/>
+                                <Binding ElementName="Image3Border" Path="ActualHeight" Mode="OneWay"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>-->
+                <!--</Grid>-->
+            </Border>
+
+            <!--Image 4-->
+            <Border Grid.Row="2" Grid.ColumnSpan="3" x:Name="Image4Border" BorderThickness="0 1 0 0" BorderBrush="{StaticResource ColorGrayTransparent}">
+                <Viewbox x:Name="Image4Viewbox">
+                    <Image x:Name="Image4" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Source="{Binding ImageSource4, RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+                </Viewbox>
+
+                <!--<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center"  TextAlignment="Center" Style="{StaticResource MaterialDesignHeadline4TextBlock}">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="Camera 4&#x0d;&#x0a;{0} x {1}">
+                            <Binding ElementName="Image4Border" Path="ActualWidth" Mode="OneWay"/>
+                            <Binding ElementName="Image4Border" Path="ActualHeight" Mode="OneWay"/>
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>-->
+            </Border>
+            <!--#endregion-->
+
+            <!--#region Chart  -->
+            <Border Grid.Row="3" Grid.ColumnSpan="3" x:Name="ChartBorder" BorderThickness="0 1 0 0" BorderBrush="{StaticResource ColorGrayTransparent}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <!--//-->
+                    <TextBlock Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Style="{StaticResource MaterialDesignHeadline4TextBlock}">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="Chart Image &#x0d;&#x0a;{0} x {1}">
+                                <Binding ElementName="ChartBorder"  Path="ActualWidth" Mode="OneWay"/>
+                                <Binding ElementName="ChartBorder" Path="ActualHeight" Mode="OneWay"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Grid>
+            </Border>
+            <!--#endregion-->
+
+            <!--#region 方塊流程圖 -->
+            <Border Grid.Row="4" Grid.ColumnSpan="3" x:Name="ProcedureBorder" BorderThickness="0 1 0 0" BorderBrush="{StaticResource ColorGrayTransparent}">
+                <!--<ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto">-->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="12 8">
+                    <StackPanel.Resources>
+                        <Style TargetType="materialDesign:PackIcon">
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Width" Value="64"/>
+                            <!--<Setter Property="Height" Value="{Binding Width, RelativeSource={RelativeSource Mode=Self}}"/>-->
+                        </Style>
+
+                        <!--<Style TargetType="control:ProcedureBlock">
+                        </Style>-->
+                    </StackPanel.Resources>
+
+                    <!--
+                        <TextBlock Text="{Binding CurrentStep, Converter={StaticResource EqualConverter}, ConverterParameter=-1}"/>
+                        <TextBlock Text="{Binding CurrentStep, Converter={StaticResource EqualConverter}, ConverterParameter=0}"/>
+                        <TextBlock Text="{Binding CurrentStep, Converter={StaticResource EqualConverter}, ConverterParameter=1}"/>
+                    -->
+                    <!--<TextBlock Text="{Binding CurrentStep, UpdateSourceTrigger=PropertyChanged}"/>-->
+
+                    <!--HighLight="{Binding Step, Converter={StaticResource EqualConverter}, ConverterParameter=0}"-->
+                    <control:ProcedureBlock BlockName="初始化" StepNumber="0" CurrentStep="{Binding CurrentStep, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                            Error="{Binding StepError, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <materialDesign:PackIcon Kind="ArrowRight" Width="32"/>
+
+                    <control:ProcedureBlock BlockName="原點復歸" StepNumber="1" CurrentStep="{Binding CurrentStep, UpdateSourceTrigger=PropertyChanged}"
+                                            Error="{Binding StepError, UpdateSourceTrigger=PropertyChanged}"
+                                            SubPackIcon="Flag" EnableSubPackIcon="True" SubPackIconColor="{StaticResource ColorInfo}"/>
+
+                    <materialDesign:PackIcon Kind="ArrowRight" Width="32"/>
+
+                    <control:ProcedureBlock BlockName="選擇規格" StepNumber="2" CurrentStep="{Binding CurrentStep, UpdateSourceTrigger=PropertyChanged}"
+                                            Error="{Binding StepError, UpdateSourceTrigger=PropertyChanged}"
+                                            EnableSubPackIcon="True" SubPackIcon="User" SubPackIconColor="{StaticResource ColorInfo}"/>
+
+                    <materialDesign:PackIcon Kind="ArrowRight" Width="32"/>
+
+                    <control:ProcedureBlock BlockName="啟動檢驗" StepNumber="3" CurrentStep="{Binding CurrentStep, UpdateSourceTrigger=PropertyChanged}"
+                                            Error="{Binding StepError, UpdateSourceTrigger=PropertyChanged}"
+                                            EnableSubPackIcon="True" SubPackIcon="User" SubPackIconColor="{StaticResource ColorInfo}"/>
+
+                    <materialDesign:PackIcon Kind="ArrowRight" Width="32"/>
+
+                    <Border BorderBrush="{StaticResource ColorSuccessTransparent}" BorderThickness="3" CornerRadius="8" Margin="-4 -12">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="4 0">
+                            <control:ProcedureBlock BlockName="等待上料" StepNumber="4" CurrentStep="{Binding CurrentStep, UpdateSourceTrigger=PropertyChanged}"
+                                                        EnableSubPackIcon="True" SubPackIcon="User" SubPackIconColor="{StaticResource ColorInfo}"/>
+
+                            <materialDesign:PackIcon Kind="ArrowRight" Width="32"/>
+
+                            <control:ProcedureBlock BlockName="工件對位" StepNumber="5" CurrentStep="{Binding CurrentStep, UpdateSourceTrigger=PropertyChanged}"/>
+
+                            <materialDesign:PackIcon Kind="ArrowRight" Width="32"/>
+
+                            <control:ProcedureBlock BlockName="毛邊檢測" StepNumber="6" CurrentStep="{Binding CurrentStep, UpdateSourceTrigger=PropertyChanged}"/>
+
+                            <materialDesign:PackIcon Kind="ArrowRight" Width="32"/>
+
+                            <control:ProcedureBlock BlockName="外觀檢測" StepNumber="7" CurrentStep="{Binding CurrentStep, UpdateSourceTrigger=PropertyChanged}"/>
+
+                            <materialDesign:PackIcon Kind="ArrowRight" Width="32"/>
+
+                            <control:ProcedureBlock BlockName="等待下料" StepNumber="8" CurrentStep="{Binding CurrentStep, UpdateSourceTrigger=PropertyChanged}"
+                                                    EnableSubPackIcon="True" SubPackIcon="User" SubPackIconColor="{StaticResource ColorInfo}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <materialDesign:PackIcon Kind="ArrowRight" Width="32"/>
+
+                    <control:ProcedureBlock BlockName="完成檢驗" StepNumber="9" CurrentStep="{Binding CurrentStep, UpdateSourceTrigger=PropertyChanged}"
+                                            EnableSubPackIcon="True" SubPackIcon="CheckBold" SubPackIconColor="{StaticResource ColorTeal}"/>
+
+                </StackPanel>
+                <!--</ScrollViewer>-->
+            </Border>
+
+            <!--<Border Grid.Row="3" Grid.ColumnSpan="3" x:Name="ProcedureBorder2" CornerRadius="8" BorderThickness="5" BorderBrush="{StaticResource ColorSuccessTransparent}" Background="{StaticResource ColorBrown}">
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"
+                           Style="{StaticResource MaterialDesignHeadline4TextBlock}">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}}{0} x {1}">
+                                <Binding ElementName="ProcedureBorder"  Path="ActualWidth" Mode="OneWay"/>
+                                <Binding ElementName="ProcedureBorder" Path="ActualHeight" Mode="OneWay"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+            </Border>-->
+            <!--#endregion-->
+
+            <!--Record List-->
+            <Border Grid.RowSpan="100" Grid.Column="3" x:Name="RecordListBorder" BorderThickness="1 0 0 0" BorderBrush="{StaticResource ColorGrayTransparent}"
+                    Background="{StaticResource ColorBlueGrayTranparent}">
+                <!--<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Style="{StaticResource MaterialDesignHeadline4TextBlock}">Record List</TextBlock>-->
+
+                <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
+                    <ScrollViewer.Style>
+                        <Style TargetType="{x:Type ScrollViewer}" BasedOn="{StaticResource ScrollViewerPrimary}">
+                            <!--<Setter Property=""-->
+                        </Style>
+                    </ScrollViewer.Style>
+                    
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" MinHeight="1080">
+
+                        <materialDesign:Card Background="AntiqueWhite" Style="{StaticResource PanelTopCard}" Visibility="Collapsed">
+                            <DockPanel Background="Transparent">
+                                <DockPanel.Resources>
+                                    <Style TargetType="materialDesign:PackIcon" x:Key="GoodStatus">
+                                        <Setter Property="Width" Value="16"/>
+                                        <Setter Property="Height" Value="16"/>
+                                        <Setter Property="Canvas.Right" Value="0"/>
+                                        <Setter Property="Canvas.Bottom" Value="0"/>
+
+                                        <Setter Property="Kind" Value="CloseThick"/>
+                                        <Setter Property="Foreground" Value="{StaticResource ColorError}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding (ctProperty:StatusHelper.Connected), RelativeSource={RelativeSource Mode=Self}}" Value="True">
+                                                <Setter Property="Kind" Value="CheckThick"/>
+                                                <Setter Property="Foreground" Value="{StaticResource ColorSuccess}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DockPanel.Resources>
+
+                                <DockPanel DockPanel.Dock="top" Background="Transparent">
+                                    <TextBlock DockPanel.Dock="Left" Margin="12 0 0 0" FontWeight="Bold" VerticalAlignment="Center" FontSize="18">
+                                        <TextBlock.Style>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="Text" Value="OK"/>
+                                                <Setter Property="Foreground" Value="{StaticResource ColorSuccess}"/>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+
+                                    <Border DockPanel.Dock="Right" BorderBrush="Transparent" BorderThickness="1" CornerRadius="2" VerticalAlignment="Center" Padding="0 2"
+                                        Width="32" Height="32" HorizontalAlignment="Right">
+                                        <Canvas Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                            <materialDesign:PackIcon Kind="Cube" Canvas.Left="2" Canvas.Top="1" Width="26" Height="24" Foreground="{StaticResource ColorBlueGray}"/>
+                                            <materialDesign:PackIcon Style="{StaticResource GoodStatus}" />
+                                        </Canvas>
+                                    </Border>
+                                </DockPanel>
+                                <!--//-->
+                                <Separator Margin="0 4" DockPanel.Dock="Top"/>
+                                <!--//-->
+                                
+                                
+                                
+                                <!--//-->
+                                <Separator Margin="0 4" DockPanel.Dock="Top"/>
+                                <!--//-->
+                                <Grid DockPanel.Dock="Top" >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="5*"/>
+                                        <ColumnDefinition Width="1*"/>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="5*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Column="0" Grid.Row="0" Text="檢驗時間" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
+                                    <TextBox Grid.Column="1" Grid.Row="0" Margin="8 2 0 2" VerticalAlignment="Center" HorizontalAlignment="Stretch" Padding="0 3" TextAlignment="Center"
+                                             IsReadOnly="True" Cursor="Arrow" Focusable="False"
+                                             Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+
+                                    <TextBlock Grid.Column="3" Grid.Row="0" Text="完成時間" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
+                                    <TextBox Grid.Column="4" Grid.Row="0" Margin="8 2 0 2" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="00:00:00" Padding="0 3" TextAlignment="Center"
+                                             IsReadOnly="True" Cursor="Arrow" Focusable="False"
+                                             Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                                </Grid>
+                            </DockPanel>
+                        </materialDesign:Card>
+
+                        <control:ResultCard Background="AntiqueWhite" Result="True" Style="{StaticResource PanelTopCard}"/>
+
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Style="{StaticResource MaterialDesignHeadline4TextBlock}">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="Record List&#x0d;&#x0a;{0} x {1}">
+                                    <Binding ElementName="RecordListBorder"  Path="ActualWidth" Mode="OneWay"/>
+                                    <Binding ElementName="RecordListBorder" Path="ActualHeight" Mode="OneWay"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+        <!--</StackPanel>-->
+    </Border>
+
+</StackPanel>
+ 
