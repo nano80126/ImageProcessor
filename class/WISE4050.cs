@@ -1,7 +1,7 @@
 ﻿using System;
-using MCAJawIns.Driver;
+using ImageProcessor.Driver;
 
-namespace MCAJawIns
+namespace ImageProcessor
 {
     public class WISE4050 : TCPIPBase
     {

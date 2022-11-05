@@ -12,9 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using MCAJawIns.Tab;
+using ImageProcessor.Tab;
 
-namespace MCAJawIns.Panel
+namespace ImageProcessor.Panel
 {
     /// <summary>
     /// LightPanel.xaml 的互動邏輯

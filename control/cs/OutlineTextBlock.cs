@@ -10,7 +10,7 @@ using MaterialDesignThemes.Wpf;
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
 
-namespace MCAJawIns.Control
+namespace ImageProcessor.Control
 {
     public class OutlineTextBlock : TextBlock
     {

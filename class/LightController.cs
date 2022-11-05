@@ -10,9 +10,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
-using MCAJawIns.Driver;
+using ImageProcessor.Driver;
 
-namespace MCAJawIns
+namespace ImageProcessor
 {
     /// <summary>
     /// 光源控制器通道

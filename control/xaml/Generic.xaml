@@ -1,6 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:ctrl="clr-namespace:MCAJawIns.Control">
+                    xmlns:ctrl="clr-namespace:ImageProcessor.Control">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="CustomCard.xaml"/>

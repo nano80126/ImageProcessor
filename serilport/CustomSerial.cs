@@ -7,7 +7,7 @@ using System.IO.Ports;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace MCAJawIns
+namespace ImageProcessor
 {
     interface ICustomSerial
     {

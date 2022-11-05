@@ -13,7 +13,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Globalization;
 
-namespace MCAJawIns.Product
+namespace ImageProcessor.Product
 {
     /// <summary>
     /// MCA Jaw 檢驗結果輸出

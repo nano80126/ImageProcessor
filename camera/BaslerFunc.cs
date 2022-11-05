@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 using Basler.Pylon;
 using OpenCvSharp;
 using System.Windows.Media;
-using MCAJawIns.Tab;
+using ImageProcessor.Tab;
 using System.Threading;
 
-namespace MCAJawIns
+namespace ImageProcessor
 {
     /// <summary>
     /// General Basler Function For Some Operation (暫時保留)

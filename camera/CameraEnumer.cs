@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows.Data;
 
-namespace MCAJawIns
+namespace ImageProcessor
 {
     /// <summary>
     /// Basler Camera Enumerator

@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace MCAJawIns
+namespace ImageProcessor
 {
     /// <summary>
     /// Advantech PCI 1730U I/O Card 控制器

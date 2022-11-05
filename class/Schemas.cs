@@ -2,7 +2,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace MCAJawIns.Mongo
+namespace ImageProcessor.Mongo
 {
     /// <summary>
     /// 應用程式使用資料庫名稱

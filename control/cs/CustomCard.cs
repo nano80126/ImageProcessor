@@ -9,7 +9,7 @@ using System.Windows;
 using MaterialDesignThemes.Wpf;
 using System.Windows.Input;
 
-namespace MCAJawIns.Control
+namespace ImageProcessor.Control
 {
     //[System.Windows.Markup.ContentProperty(nameof(Footer))]
     public class CustomCard : ContentControl

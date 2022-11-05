@@ -89,6 +89,98 @@ namespace ObservableCollections
         #endregion
     }
 
+    public sealed partial class ObservableQueue<T> : Queue<T>, INotifyCollectionChanged, INotifyPropertyChanged
+    {
+        Queue<T> queue = new Queue<T>();
+        Stack<T> stack = new Stack<T>();
+
+        public object SyncRoot { get; } = new object();
+
+        #region 建構子
+        public ObservableQueue()
+        {
+        }
+
+        public ObservableQueue(IEnumerable<T> collection) : base(collection)
+        {
+        }
+
+        public ObservableQueue(int capacity) : base(capacity)
+        {
+        }
+        #endregion
+
+        public new void Enqueue(T item)
+        {
+            lock (SyncRoot)
+            {
+                base.Enqueue(item);
+                OnCollectionAdded(item);
+            }
+        }
+
+        public new T Dequeue()
+        {
+            lock (SyncRoot)
+            {
+                T item = base.Dequeue();
+                OnCollectionRemoved(item);
+                return item;
+            }
+        }
+
+        public new void Clear()
+        {
+            lock (SyncRoot)
+            {
+                base.Clear();
+                OnCollectionReset();
+            }
+        }
+
+        #region Property & Collection Changed
+        public event PropertyChangedEventHandler PropertyChanged;
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+
+        /// <summary>
+        /// Reset
+        /// </summary>
+        /// <param name="action"></param>
+        private void OnCollectionReset()
+        {
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            OnPropertyChanged(nameof(Count));
+        }
+
+        /// <summary>
+        /// Add & Remove
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="item"></param>
+        private void OnCollectionAdded(T item)
+        {
+            int changedIndex = Count - 1;
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, changedIndex));
+            OnPropertyChanged(nameof(Count));
+        }
+
+        private void OnCollectionRemoved(T item)
+        {
+            int changedIndex = 0;
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, changedIndex));
+            OnPropertyChanged(nameof(Count));
+        }
+
+
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion
+    }
+
+
     public sealed partial class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, INotifyCollectionChanged, INotifyPropertyChanged
     {
         public object SyncRoot { get; } = new object();

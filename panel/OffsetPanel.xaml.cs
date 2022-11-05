@@ -2,7 +2,7 @@
 using System.Windows.Input;
 using Basler.Pylon;
 
-namespace MCAJawIns.Panel
+namespace ImageProcessor.Panel
 {
     /// <summary>
     /// OffsetPanel.xaml 的互動邏輯

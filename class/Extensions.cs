@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using OpenCvSharp;
 
-namespace MCAJawIns
+namespace ImageProcessor
 {
     #region Mat & Bitmap Convert to ImageSource Extension
     public static class ImageSourceTransfer

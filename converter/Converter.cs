@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Data;
 
-namespace MCAJawIns.Converter
+namespace ImageProcessor.Converter
 {
 
 #if false

@@ -9,7 +9,7 @@ using System.Windows.Controls;
 using SystemInfo;
 using MongoDB.Bson;
 
-namespace MCAJawIns.Tab
+namespace ImageProcessor.Tab
 {
     /// <summary>
     /// SystemInfoTab.xaml 的互動邏輯

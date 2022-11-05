@@ -15,10 +15,10 @@ using System.Windows.Shapes;
 using System.Data;
 using System.Drawing;
 using System.IO;
-using MCAJawIns.Tab;
+using ImageProcessor.Tab;
 using System.Diagnostics;
 
-namespace MCAJawIns.Panel
+namespace ImageProcessor.Panel
 {
     /// <summary>
     /// PointsPanel.xaml 的互動邏輯

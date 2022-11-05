@@ -7,9 +7,9 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using Basler.Pylon;
-using MCAJawIns.Tab;
+using ImageProcessor.Tab;
 
-namespace MCAJawIns.Panel
+namespace ImageProcessor.Panel
 {
     /// <summary>
     /// ConfigPanel.xaml 的互動邏輯

@@ -5,8 +5,8 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>niti.ico</ApplicationIcon>
-    <AssemblyName>MCAJawIns</AssemblyName>
-    <RootNamespace>MCAJawIns</RootNamespace>
+    <AssemblyName>ImageProcessor</AssemblyName>
+    <RootNamespace>ImageProcessor</RootNamespace>
     <Configurations>Debug;Release;Debug Jaw S</Configurations>
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
@@ -87,6 +87,10 @@
     <Page Remove="tabs\ModbusMotorTab.xaml" />
     <Page Remove="tabs\MotionTab.xaml" />
     <Page Remove="IOWindow.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="algorithm\Algorithm.cs" />
   </ItemGroup>
 
   <ItemGroup>

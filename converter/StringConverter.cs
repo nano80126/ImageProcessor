@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Data;
 
-namespace MCAJawIns.Converter
+namespace ImageProcessor.Converter
 {
     #region 字串 Equal 轉換器
     /// <summary>

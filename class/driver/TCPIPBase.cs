@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace MCAJawIns.Driver
+namespace ImageProcessor.Driver
 {
     public class TCPIPBase : INotifyPropertyChanged, IDisposable
     {

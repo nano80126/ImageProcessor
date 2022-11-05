@@ -7,7 +7,7 @@ using System.Windows.Data;
 // 轉換前是否確認 IsNumer?
 // 轉換前是否確認 IsNumer?
 
-namespace MCAJawIns.Converter
+namespace ImageProcessor.Converter
 {
     #region 數字 Equal 轉換器
     /// <summary>

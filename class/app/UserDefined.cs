@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MCAJawIns
+namespace ImageProcessor
 {
     public partial class MainWindow : System.Windows.Window
     {

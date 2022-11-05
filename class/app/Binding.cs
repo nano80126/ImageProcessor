@@ -21,7 +21,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using OpenCvSharp;
 
-namespace MCAJawIns
+namespace ImageProcessor
 {
     /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// /// 
     /// This file is for binding data of application (public bindings) 

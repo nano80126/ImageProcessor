@@ -22,7 +22,7 @@ using MaterialDesignThemes.Wpf;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace MCAJawIns.Control
+namespace ImageProcessor.Control
 {
     /// <summary>
     /// SpecListView.xaml 的互動邏輯

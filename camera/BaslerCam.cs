@@ -8,7 +8,7 @@ using Basler.Pylon;
 using Debug = System.Diagnostics.Debug;
 
 
-namespace MCAJawIns
+namespace ImageProcessor
 {
     /// <summary>
     /// Basler Camera 物件

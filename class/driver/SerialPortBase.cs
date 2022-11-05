@@ -8,7 +8,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 
-namespace MCAJawIns.Driver
+namespace ImageProcessor.Driver
 {
     internal interface ISerialPortBase
     {

@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace MCAJawIns
+namespace ImageProcessor
 {
     /// <summary>
     /// ModeWindow.xaml 的互動邏輯

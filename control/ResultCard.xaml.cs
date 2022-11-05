@@ -15,7 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MaterialDesignThemes.Wpf;
 
-namespace MCAJawIns.Control
+namespace ImageProcessor.Control
 {
     /// <summary>
     /// ResultCard.xaml 的互動邏輯

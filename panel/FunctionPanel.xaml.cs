@@ -15,11 +15,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using MCAJawIns.Tab;
+using ImageProcessor.Tab;
 using Microsoft.Win32;
 using OpenCvSharp;
 
-namespace MCAJawIns.Panel
+namespace ImageProcessor.Panel
 {
     /// <summary>
     /// FunctionPanel.xaml 的互動邏輯
@@ -34,6 +34,8 @@ namespace MCAJawIns.Panel
         public EngineerTab EngineerTab { get; set; }
 
         public ObservableCollections.ObservableStack<int> ObservableStack { get; } = new ObservableCollections.ObservableStack<int>();
+
+        public ObservableCollections.ObservableQueue<int> ObservableQueue { get; } = new ObservableCollections.ObservableQueue<int>();
 
         public ObservableCollections.ObservableDictionary<int, int> ObservableDictionary { get; } = new ObservableCollections.ObservableDictionary<int, int>();
 
@@ -52,7 +54,15 @@ namespace MCAJawIns.Panel
 
             ObservableDictionary.CollectionChanged += ObservableDictionary_CollectionChanged;
 
-            BindingOperations.EnableCollectionSynchronization(ObservableStack, _locker);
+            ObservableQueue.CollectionChanged += ObservableQueue_CollectionChanged;
+
+            //BindingOperations.EnableCollectionSynchronization(ObservableStack, _locker);
+            BindingOperations.EnableCollectionSynchronization(ObservableQueue, _locker);
+        }
+
+        private void ObservableQueue_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine($"{e.Action} {e.NewItems?[0]} {e.OldItems?[0]} {e.NewStartingIndex} {e.OldStartingIndex}");
         }
 
         private void ObservableDictionary_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -120,56 +130,57 @@ namespace MCAJawIns.Panel
 
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            //Task.Run(() =>
-            //{
-            //    for (int i = 0; i <= 20; i++)
-            //    {
-            //        if (i == 20)
-            //        {
-            //            ObservableStack.Clear();
-            //            break;
-            //        }
-
-            //        if (ObservableStack.Count > 5)
-            //        {
-            //            int j = ObservableStack.Pop();
-            //            System.Diagnostics.Debug.WriteLine($"Pop: {j}");
-            //        }
-            //        else
-            //        {
-            //            ObservableStack.Push(i);
-            //        }
-            //        SpinWait.SpinUntil(() => false, 500);
-            //    }
-            //});
             Task.Run(() =>
             {
                 for (int i = 0; i <= 20; i++)
                 {
                     if (i == 20)
                     {
-                        ObservableDictionary.Clear();
+                        ObservableQueue.Clear();
                         break;
                     }
 
-                    System.Diagnostics.Debug.WriteLine($"{ObservableDictionary.ContainsKey(i % 3)} {i % 3}");
-
-                    if (!ObservableDictionary.ContainsKey(i % 3))
+                    if (ObservableQueue.Count > 5)
                     {
-                        ObservableDictionary.Add(i % 3, i);
+                        int j = ObservableQueue.Dequeue();
+                        System.Diagnostics.Debug.WriteLine($"Dequeue: {j}");
                     }
                     else
                     {
-                        ObservableDictionary.Remove(i % 3);
+                        ObservableQueue.Enqueue(i);
                     }
-                    SpinWait.SpinUntil(() => false, 200);
+                    SpinWait.SpinUntil(() => false, 500);
                 }
-
-                ObservableDictionary[0] = 2;
-                SpinWait.SpinUntil(() => false, 200);
-                ObservableDictionary[0] = 3;
-                SpinWait.SpinUntil(() => false, 200);
             });
+
+            //Task.Run(() =>
+            //{
+            //    for (int i = 0; i <= 20; i++)
+            //    {
+            //        if (i == 20)
+            //        {
+            //            ObservableDictionary.Clear();
+            //            break;
+            //        }
+
+            //        System.Diagnostics.Debug.WriteLine($"{ObservableDictionary.ContainsKey(i % 3)} {i % 3}");
+
+            //        if (!ObservableDictionary.ContainsKey(i % 3))
+            //        {
+            //            ObservableDictionary.Add(i % 3, i);
+            //        }
+            //        else
+            //        {
+            //            ObservableDictionary.Remove(i % 3);
+            //        }
+            //        SpinWait.SpinUntil(() => false, 200);
+            //    }
+
+            //    ObservableDictionary[0] = 2;
+            //    SpinWait.SpinUntil(() => false, 200);
+            //    ObservableDictionary[0] = 3;
+            //    SpinWait.SpinUntil(() => false, 200);
+            //});
         }
     }
 }

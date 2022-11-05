@@ -7,7 +7,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 
 
-namespace MCAJawIns
+namespace ImageProcessor
 {
 
     /// <summary>

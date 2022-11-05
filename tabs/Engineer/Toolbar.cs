@@ -10,8 +10,9 @@ using System.Windows.Input;
 using Basler.Pylon;
 using Microsoft.Win32;
 using OpenCvSharp;
+using ImageProcessor.Algorithm;
 
-namespace MCAJawIns.Tab
+namespace ImageProcessor.Tab
 {
     public partial class EngineerTab : StackPanel
     {
@@ -136,18 +137,26 @@ namespace MCAJawIns.Tab
         #endregion
 
         #region 右 Toolbar
-        private int count;
+        // private int count;
         private void Test_Click(object sender, RoutedEventArgs e)
         {
-            if (count++ % 2 == 0)
-            {
-                LightPanel.LightSerial.SetAllChannelValue(96, 64);
-            }
-            else
-            {
-                LightPanel.LightSerial.SetAllChannelValue(0, 0);
-            }
-            Basler_StreamGrabber_RetrieveImage(MainWindow.BaslerCam);
+            Debug.WriteLine($"{DateTime.Now:ss.fff}");
+
+            CameraModules modules = new CameraModules(3);
+
+            modules.SetModulesCofigure(0, 2.2 * 1e-3, 0.25);
+            modules.SetModulesCofigure(1, 2.2 * 1e-3, 0.21);
+            modules.SetModulesCofigure(2, 3.42 * 1e-3, 0.12);
+
+            ICameraModuleConfigure config1 = modules.GetModulesConfigure(0);
+            ICameraModuleConfigure config2 = modules.GetModulesConfigure(1);
+            ICameraModuleConfigure config3 = modules.GetModulesConfigure(2);
+
+            Debug.WriteLine($"{config1.PixelSize} {config1.LensMagnification}");
+            Debug.WriteLine($"{config2.PixelSize} {config2.LensMagnification}");
+            Debug.WriteLine($"{config3.PixelSize} {config3.LensMagnification}");
+
+            Debug.WriteLine($"{DateTime.Now:ss.fff}");
         }
 
         private void ReadDXF_Click(object sneder, RoutedEventArgs e)

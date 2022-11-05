@@ -9,19 +9,19 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 using MaterialDesignThemes.Wpf;
-using MCAJawIns.Tab;
+using ImageProcessor.Tab;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-using MCAJawInfo = MCAJawIns.Mongo.Info;
+using MCAJawInfo = ImageProcessor.Mongo.Info;
 using System.IO;
 using MongoDB.Bson;
-using MCAJawIns.Mongo;
+using ImageProcessor.Mongo;
 using System.Collections.ObjectModel;
 using SystemInfo;
 using System.Collections.Generic;
 
-namespace MCAJawIns
+namespace ImageProcessor
 {
     #region Enumerator
     public enum JawTypes
@@ -122,7 +122,7 @@ namespace MCAJawIns
         public static BaslerCam[] BaslerCams { get; set; }
         #endregion
 
-        #region Serial Port Enumerator (SerialPort 列舉器)
+        #region Serial Port Enumerator
         /// <summary>
         /// Com Port 列舉器，
         /// </summary>
@@ -139,11 +139,6 @@ namespace MCAJawIns
 
         #region I/O Controller
         public static WISE4050 ModbusTCPIO { get; set; }
-        #endregion
-
-        #region EtherCAT Motion
-        [Obsolete]
-        public static ServoMotion ServoMotion { get; set; }
         #endregion
 
         #region Database
@@ -219,7 +214,7 @@ namespace MCAJawIns
             //Debug.WriteLine($"------------------------");
 
             #region Find Resource
-            MsgInformer = FindResource(nameof(MCAJawIns.MsgInformer)) as MsgInformer;
+            MsgInformer = FindResource(nameof(ImageProcessor.MsgInformer)) as MsgInformer;
             MsgInformer.EnableCollectionBinding();
             MsgInformer.ProgressValueChanged += MsgInformer_ProgressValueChanged;   // 綁定 ProgressBar Value Changed 事件
             MsgInformer.EnableProgressBar();
@@ -593,7 +588,7 @@ namespace MCAJawIns
 /// <summary>
 /// 自訂義 property 用
 /// </summary>
-namespace MCAJawIns.CustomProperty
+namespace ImageProcessor.CustomProperty
 {
     public class StatusHelper : DependencyObject
     {

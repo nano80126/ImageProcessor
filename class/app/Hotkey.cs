@@ -5,10 +5,10 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Controls;
 using System;
-using MCAJawIns.Tab;
+using ImageProcessor.Tab;
 using System.Globalization;
 
-namespace MCAJawIns
+namespace ImageProcessor
 {
     public partial class MainWindow : Window
     {

@@ -4,7 +4,7 @@ using System.IO.Ports;
 using System.Threading;
 using System.Windows.Data;
 
-namespace MCAJawIns
+namespace ImageProcessor
 {
     public class SerialEnumer : LongLifeWorker
     {

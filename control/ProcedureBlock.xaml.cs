@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace MCAJawIns.Control
+namespace ImageProcessor.Control
 {
     /// <summary>
     /// ProcedureBlock.xaml 的互動邏輯

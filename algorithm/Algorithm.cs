@@ -7,8 +7,80 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MCAJawIns.Algorithm
+namespace ImageProcessor.Algorithm
 {
+
+    /// <summary>
+    /// 相機模組參數介面
+    /// <para>Pixel Size & Magnification</para>
+    /// </summary>
+    public interface ICameraModuleConfigure
+    {
+        public double PixelSize { get; }
+
+        public double LensMagnification { get; }
+
+        public void SetPixelSize(double pxSize);
+        public void SetMagnification(double mag);
+    }
+
+    public class CameraModuleConfig : ICameraModuleConfigure
+    {
+        public double PixelSize { get; private set; }
+
+        public double LensMagnification { get; private set; }
+
+        public void SetMagnification(double mag)
+        {
+            LensMagnification = mag;
+        }
+
+        public void SetPixelSize(double pxSize)
+        {
+            PixelSize = pxSize;
+        }
+    }
+
+    /// <summary>
+    /// 多相機模組介面
+    /// </summary>
+    public interface ICameraModules
+    {
+        public ICameraModuleConfigure GetModulesConfigure(int index);
+
+        public void SetModulesCofigure(int index, double pixelSize, double magnification);
+    }
+
+    public  class CameraModules : ICameraModules
+    {
+        //public List<ICameraModuleConfigure> ModulesConfigureList { get; }
+        private List<ICameraModuleConfigure> _modulesConfigureList;
+
+        public CameraModules(int modulesCapacity)
+        {
+            _modulesConfigureList = new List<ICameraModuleConfigure>(modulesCapacity);
+
+            for (int i = 0; i < modulesCapacity; i++)
+            {
+                _modulesConfigureList.Add(new CameraModuleConfig());
+            }
+        }
+
+        public ICameraModuleConfigure GetModulesConfigure(int index)
+        {
+            return _modulesConfigureList[index];
+        }
+
+        public void SetModulesCofigure(int index, double pixelSize, double magnification)
+        {
+            ICameraModuleConfigure configure = _modulesConfigureList[index];
+
+            configure.SetPixelSize(pixelSize);
+            configure.SetMagnification(magnification);
+        }
+    }
+
+    [Obsolete]
     public abstract class Algorithm : IDisposable
     {
         /// <summary>
