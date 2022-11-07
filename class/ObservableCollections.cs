@@ -91,9 +91,6 @@ namespace ObservableCollections
 
     public sealed partial class ObservableQueue<T> : Queue<T>, INotifyCollectionChanged, INotifyPropertyChanged
     {
-        Queue<T> queue = new Queue<T>();
-        Stack<T> stack = new Stack<T>();
-
         public object SyncRoot { get; } = new object();
 
         #region 建構子
@@ -171,7 +168,6 @@ namespace ObservableCollections
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, changedIndex));
             OnPropertyChanged(nameof(Count));
         }
-
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
